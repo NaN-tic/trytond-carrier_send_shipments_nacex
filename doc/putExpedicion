@@ -1,0 +1,89 @@
+	method.titulo='putExpedicion';
+	method.metodo='String putExpedicion (String user, String pass, String[] data)';
+	method.pie='Da de alta una nueva expedición en el sistema.'
+
+	method.entrada=[
+	            	['user','Usuario suministrado por NACEX'],
+	            	['pass','Contraseña en formato MD5 suministrado por NACEX'],
+	            	['data','Array de string con los parámetros de la información de la expedición.']
+				  ];
+
+	method.data=[
+	            	['del_cli','Delegación del cliente', '4','obligatorio'],
+	            	['num_cli','Código del cliente (Nº abonado Nacex)', '5','obligatorio'],
+	            	['dep_cli','Departamento del cliente', '10',''],
+	            	['fec','Fecha de la expedición (dd/mm/yyyy)', '10',''],
+	            	['tip_ser','Código de Servicio Nacex(<a href="es.codigos.html#serviciosN">ver servicios</a>)','2','obligatorio'],
+	            	['tip_cob','Código de Cobro Nacex (<a href="es.codigos.html#cobros">ver cobros</a>)','1','obligatorio'],
+	            	['exc','Número de Excesos', '3',''],
+	            	['ref_cli','Referencia del cliente (Para multiples referencias separarlas por ; )', '20',''],
+	            	['tip_env','Código de envase Nacex (<a href="es.codigos.html#envasesN">ver envases</a>)','1','obligatorio'],
+	            	['bul','Número de bultos (Ej. Para 5 bultos, 005)', '3','obligatorio'],
+	            	['kil','Peso del paquete en Kilos', '5.3','obligatorio'],
+	            	['nom_rec','Nombre de recogida', '35',''],
+	            	['dir_rec','Dirección de recogida', '60',''],
+	            	['cp_rec','Código postal recogida (Ej. 08902)', '8',''],
+	            	['pais_rec','País de recogida', '2',''],
+	            	['pob_rec','Población de recogida', '30',''],
+	            	['tel_rec','Teléfono de recogida', '15',''],
+	            	['nom_ent','Nombre de entrega', '50','obligatorio'],
+	            	['per_ent','Persona de entrega', '35',''],
+	            	['dir_ent','Dirección de entrega', '60','obligatorio'],
+	            	['pais_ent','País de entrega', '2','obligatorio'],
+	            	['cp_ent','Código postal entrega (Ej. 08902)', '15','obligatorio'],
+	            	['pob_ent','Población de entrega', '40','obligatorio'],
+	            	['tel_ent','Teléfono de entrega', '20','obligatorio'],
+	            	['ree','Importe de reembolso', '5.3',''],
+	            	['tip_ree','Código de reembolso o adelanto Nacex (<a href="es.codigos.html#ree_ade">ver reembolsos/adelanto</a>)','1',''],
+	            	['obs"n"','Observaciones, hasta 4 observaciones','38 x4',''],
+	            	['ret','Envío con retorno (S / N)', '1',''],
+	            	['ges','Código de gestión ó Trámite, (<a href="es.codigos.html#gestion">ver gestión/trámite</a>)','1',''],
+	            	['ok15','Confirmación Ok. 15 minutos (S / N)', '1',''],
+	            	['pre','Prepagado (S / N)', '1',''],
+	            	['tip_seg','Código del tipo de Seguro, (<a href="es.codigos.html#seguros">ver seguros</a>)','1',''],
+	            	['seg','Importe valor a asegurar en Euros sin decimales', '5.3',''],
+	            	['tip_ea','Tipo de Ealerta, (<a href="es.codigos.html#ealerta">ver tipos</a>)','1',''],
+	            	['ealerta','Ealerta (al móvil o dirección de e-mail indicados)', '60',''],
+	         		['alto','Alto del paquete en CM.','3',''],
+	            	['ancho','Ancho del paquete en CM.','3',''],
+	            	['largo','Largo del paquete en CM.','3',''],
+	            	['con','Contenido (Obligatorio si se trata de un envío internacional)', '80',''],
+	            	['val_dec','Valor declarado (Obligatorio si se trata de un envío internacional)', '5.3',''],
+	            	['dig','Código para digitalización o almacenaje de albaranes de cliente, (<a href="es.codigos.html#albCLientes">ver códigos</a>)','1',''],
+	            	['num_dig','Número de copias a escanear, si el número de copia es cero, se indica como 00', '2',''],
+	            	['ins_adi"n"','Línea de instrucciones adicionales de entrega, hasta 15 líneas. Requiere ins_adi informado','40 x15',''],
+
+	            	['tip_pre"n"','Tipo de prealertas, hasta 5 prealertas, (<a href="es.codigos.html#tprealerta">ver tipos</a>)','1 x5',''],
+	            	['mod_pre"n"','Modos de prealerta, hasta 5 prealertas, (<a href="es.codigos.html#mprealerta">ver modos</a>)','1 x5',''],
+	            	['pre"n"','Prealerta SMS ó Email de destino, hasta 5 prealertas','50 x5',''],
+	            	['msg"n"','Texto para mensaje prealerta plus, hasta 5 prealertas','195 x5',''],
+
+	            	['ins_adi','Para añadir o no las instrucciones adicionales será necesario informar este parámetro con los posibles valores S ó N', '1',''],
+	            	['cam_serv','Para permitir un cambio de servicio para forzar la validez de la expedición será necesario informar este parámetro con los posibles valores S ó N', '1',''],
+	            	['shop_codigo','Código del punto de entrega NacexShop', '6',''],
+	            	['frec_codigo','Código de frecuencia para servicios Interdía y Puente Urbano, (<a href="es.codigos.html#frecuencia">ver frecuencias</a>)','1','']
+				  ];
+
+
+	method.salida=[
+	           		'Código de la expedición',
+	           		'Devuelve el código de agencia de origen y el número de expedición separados por una barra “/”.',
+	           		'Color caja-ruta',
+	           		'Ruta',
+	           		'Devuelve el código de agencia de a entrega en formato AAAA',
+	           		'Nombre de la agencia de la entrega',
+	           		'Teléfono de la entrega',
+	           		'Nombre del servicio',
+	           		'Hora de la entrega',
+	           		'Código de barras',
+	           		'Fecha prevista de entrega (DD-MM-AAAA)',
+	           		'Parámetros modificados necesarios para poder documentar esta expedición. Se indicarían como parejas clave=valor separados por pipe |.'
+	           	];
+
+	method.gets= [
+	          	urlWS+'method=putExpedicion&data=del_cli=9992|num_cli=00003|tip_ser=08|tip_cob=O|ref_cli=reftest|tip_env=2|bul=1|kil=1|nom_ent=Ismael%20Tejón|dir_ent=Calle%20de%20prueba,%2034|pais_ent=ES|cp_ent=08830|pob_ent=SANT%20BOI%20DE%20LLOBREGAT|tel_ent=931234567|obs1=observaciones%20para%20la%20entrega'+credencialesWS,
+	           	'No disponible'
+	           	];
+	method.GetResp=[
+	            	'38115404|9992/10352750|ROJO|2|0850|VILADECANS|931234567|NACEX 19:00H|Entregar antes de las 19:00H.|00190038115404085008|16/09/2019|'
+	              ];

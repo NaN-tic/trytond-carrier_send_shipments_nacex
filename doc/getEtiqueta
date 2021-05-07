@@ -1,0 +1,31 @@
+	method.titulo='getEtiqueta';
+	method.metodo='String getEtiqueta (String usr, String pass, String codExp, String agencia, String numero, String modelo)';
+	method.pie='Suministra los códigos de escape para el modelo de etiquetadora indicado de dos formas distitas:'
+		+'<ul>'
+		+'<li>Por código de expedición (codExp)</li>'
+		+'<li>Por agencia y número de albarán (agencia & numero)</li>'
+		+'<ul>';
+
+	method.entrada=[
+	            	['user','Usuario suministrado por NACEX'],
+	            	['pass','Contraseña en formato MD5 suministrado por NACEX'],
+	            	['codExp','Código de expedición'],
+	            	['agencia','Agencia de recogida'],
+	            	['numero','Número de albaran'],
+	            	['modelo','Modelo de etiquetadora. Puede ser: TECSV4_B, TECEV4_B, TECFV4_B, ZEBRA_B o IMAGEN_B']
+				  ];
+
+	method.data=[];
+
+
+	method.salida=[
+	           	'Códigos de escape para enviar a la impresora o representación decodificada en Base64URL de imagénes PNG de 14,85 cm de ancho por 10,5 cm de alto.'
+	           	];
+
+	method.gets= [
+	          	urlWS+'method=getEtiqueta&data=codExp=38115412|modelo=TECFV4_B'+credencialesWS,
+	           	urlWS+'method=getEtiqueta&data=38115412|TECFV4_B'+credencialesWS
+	           	];
+	method.GetResp=[
+	            	'{D1530,1050,1475|} {AX;+000,+000,+00|} {AY;+04,1|} {C|} {PV01;0660,0050,0022,0022,B,00,B=F: 13/09/2019|} {PV02;0660,0022,0026,0026,B,00,B=EXP: 841/10171198|} {PV03;0530,1460,0020,0020,B,00,B=|} {PV04;0300,1460,0020,0020,B,00,B=18/09/2019 16:35|} {PV06;0720,0640,0080,0080,B,00,B=1|} {PV07;0720,0680,0030,0030,B,00,B=ROJO|} {PV08;0015,0296,0028,0036,B,00,B=ISMAEL TEJON|} {PC09;0015,0331,07,07,N,00,B|} {RC09;CALLE DE PRUEBA, 34|} {PC10;0015,0418,07,07,N,+00,00,B=ATT: TEL.931234567|} {PV12;0015,0380,0030,0040,B,00,B|} {RV12;08999 - CENTRAL NACEX(BARCELONA)|} {PV14;0015,0211,0020,0020,B,00,B=Abo: 9992/00003|} {PV15;0500,0211,0020,0020,B,00,B= SPACE CARGO VALENCIA S.A.|} {PV16;0015,0234,0020,0020,B,00,B=DE : DPTO. OPERACIONES|} {PV17;0500,0234,0020,0020,B,00,B= 08908|} {PV18;0015,0257,0020,0020,B,00,B=DELEGACION|} {PV19;0500,0257,0020,0020,B,00,B= HOSPITALET DEL LLOBREGAT(BARCELONA)|} {PV20;0015,0458,0024,0025,B,00,B=Obs:|} {PC21;0085,0458,07,07,N,+00,00,B|} {RC21;OBSERVACIONES PARA LA ENTREGA |} {PC22;0015,0492,07,07,N,+00,00,B|} {PC23;0015,0530,07,07,N,+00,00,B|} {PV24;0850,0095,0030,0030,B,00,B=PAQ|} {LC;0000,0187,0990,0187,0,1|} {LC;0000,0260,0990,0260,0,1|} {LC;0000,0425,0990,0425,0,1|} {LC;0000,0545,0990,0545,0,1|} {PV25;0025,0040,0038,0050,B,00,B=NACEX 19:00H|} {PC26;0025,0076,06,06,N,+00,00,B=Entregar antes de las 19:00H.|} {PV27;0680,0095,0030,0030,B,00,B=DESTINO|} {PV28;0340,0640,0080,0080,B,00,B=9992|} {PV29;0340,0670,0020,0020,B,00,B=C.A.F.|} {PV30;0340,0700,0020,0020,B,00,B=TEL. CONSULTA: 932645807|} {PV36;0740,0140,0034,0034,B,00,B=BULTOS|} {PV37;0600,0780,0026,0026,B,00,B=reftest|} {PV38;0680,0820,0026,0026,B,00,B=RECEPTOR|} {XB01;0320,1400,9,3,03,3,0200,+0000000000,000,1,00|} {RB01;NX08ES0899900|} {PV44;0780,1460,0020,0020,B,00,B=v2.7.2 TECFV4_B|} {XB00;0020,1400,2,1,05,05,12,10,02,3,0250,+0000000000,1,00|} {RB00;8410010038115412|} {PV45;0740,0180,0034,0034,B,00,B=001/001|} {XS;I,0001,0002C6000|}'
+	              ];

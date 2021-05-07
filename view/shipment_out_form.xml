@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<!-- This file is part of stock_shipment_weight. The COPYRIGHT file at the top level of
+this repository contains the full copyright notices and license terms. -->
+<data>
+    <xpath expr="/form/notebook/page[@id='carrier-delivery']" position="inside">
+        <label name="nacex_envalse"/>
+        <field name="nacex_envalse"/>
+    </xpath>
+</data>

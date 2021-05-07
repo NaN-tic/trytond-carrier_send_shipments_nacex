@@ -1,0 +1,119 @@
+#
+msgid ""
+msgstr "Content-Type: text/plain; charset=utf-8\n"
+
+msgctxt "field:carrier.api,nacex_abonado:"
+msgid "Abonado"
+msgstr "Abonado"
+
+msgctxt "field:carrier.api,nacex_delegacion:"
+msgid "Delegacion"
+msgstr "Delegacion"
+
+msgctxt "field:carrier.api,nacex_envalse:"
+msgid "Envalse"
+msgstr "Envalse"
+
+msgctxt "field:carrier.api,nacex_hora_fin1:"
+msgid "hora_fin1"
+msgstr "hora_fin1"
+
+msgctxt "field:carrier.api,nacex_hora_fin2:"
+msgid "hora_ini1"
+msgstr "hora_ini1"
+
+msgctxt "field:carrier.api,nacex_hora_ini1:"
+msgid "hora_ini1"
+msgstr "hora_ini1"
+
+msgctxt "field:carrier.api,nacex_hora_ini2:"
+msgid "hora_ini2"
+msgstr "hora_ini2"
+
+msgctxt "field:carrier.api,nacex_print:"
+msgid "Print"
+msgstr "Imprimeix"
+
+msgctxt "field:stock.shipment.out,nacex_envalse:"
+msgid "Nacex Envalse"
+msgstr "Nacex Envalse"
+
+msgctxt "model:ir.message,text:msg_missing_warehouse_address"
+msgid "Missing warehouse address"
+msgstr "Falta l'adreça del magatzem"
+
+msgctxt "model:ir.message,text:msg_nacex_add_services"
+msgid "Select a service or default service in Nacex API"
+msgstr "Selecciona un servei o el servei per defecte de API Nacex"
+
+msgctxt "model:ir.message,text:msg_nacex_connection_error"
+msgid "Nacex connection error. %(error)s"
+msgstr "Nacex error de connexió. %(error)s"
+
+msgctxt "model:ir.message,text:msg_nacex_not_manifest"
+msgid "Manifest not available"
+msgstr "Manifiesto no disponible"
+
+msgctxt "model:ir.message,text:msg_nacex_not_send"
+msgid "Not send shipment %(name)s"
+msgstr "No s'ha enviat l'albarà %(name)s"
+
+msgctxt "model:ir.message,text:msg_nacex_not_send_error"
+msgid "Not send shipment %(name)s. %(error)s"
+msgstr "No s'ha enviat l'albarà %(name)s. %(error)s"
+
+msgctxt "model:ir.message,text:msg_nacex_test_connection"
+msgid "%(message)s"
+msgstr "%(message)s"
+
+msgctxt "selection:carrier.api,nacex_envalse:"
+msgid "Bag"
+msgstr "Bag"
+
+msgctxt "selection:carrier.api,nacex_envalse:"
+msgid "Docs"
+msgstr "Docs"
+
+msgctxt "selection:carrier.api,nacex_envalse:"
+msgid "Documents"
+msgstr "Documents"
+
+msgctxt "selection:carrier.api,nacex_envalse:"
+msgid "Muestras"
+msgstr "Muestras"
+
+msgctxt "selection:carrier.api,nacex_envalse:"
+msgid "Pag"
+msgstr "Pag"
+
+msgctxt "selection:carrier.api,nacex_print:"
+msgid "IMAGEN"
+msgstr "IMAGEN"
+
+msgctxt "selection:carrier.api,nacex_print:"
+msgid "TECFV4"
+msgstr "TECFV4"
+
+msgctxt "selection:carrier.api,nacex_print:"
+msgid "TECSV4"
+msgstr "TECSV4"
+
+msgctxt "selection:carrier.api,nacex_print:"
+msgid "ZEBRA"
+msgstr "ZEBRA"
+
+msgctxt "view:carrier.api:"
+msgid "Nacex"
+msgstr "Nacex"
+
+msgctxt "wizard_button:carrier.send.shipments,result,end:"
+msgid "Close"
+msgstr "Tanca"
+
+msgctxt "wizard_button:carrier.send.shipments,start,end:"
+msgid "Cancel"
+msgstr "Cancela"
+
+msgctxt "wizard_button:carrier.send.shipments,start,send:"
+msgid "Send"
+msgstr "Envia"

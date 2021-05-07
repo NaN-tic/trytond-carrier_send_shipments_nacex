@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!-- This file is part of the carrier_send_shipments_nacex module for Tryton.
+The COPYRIGHT file at the top level of this repository contains the full
+copyright notices and license terms. -->
+<data>
+    <xpath expr="/form/notebook/page[@id='api']" position="after">
+        <page string="Nacex" id="nacex">
+            <label name="nacex_delegacion"/>
+            <field name="nacex_delegacion"/>
+            <label name="nacex_abonado"/>
+            <field name="nacex_abonado"/>
+            <label name="nacex_hora_ini1"/>
+            <field name="nacex_hora_ini1"/>
+            <label name="nacex_hora_fin1"/>
+            <field name="nacex_hora_fin1"/>
+            <label name="nacex_hora_ini2"/>
+            <field name="nacex_hora_ini2"/>
+            <label name="nacex_hora_fin2"/>
+            <field name="nacex_hora_fin2"/>
+            <label name="nacex_envalse"/>
+            <field name="nacex_envalse"/>
+            <label name="nacex_print"/>
+            <field name="nacex_print"/>
+        </page>
+    </xpath>
+</data>

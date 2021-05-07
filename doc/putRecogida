@@ -1,0 +1,103 @@
+method.titulo='putRecogida';
+method.metodo='String putRecogida (String user, String pass, String[] data)';
+method.pie='Da de alta una nueva recogida en el sistema.'
+
+method.entrada=[
+              ['user','Usuario suministrado por NACEX'],
+              ['pass','Contraseña en formato MD5 suministrado por NACEX'],
+              ['data','Array de string con los parámetros de la información de la expedición.']
+        ];
+
+method.data=[
+        ['delcli','Delegación del cliente','4','obligatorio'],
+        ['numcli','Código del cliente (Nº abonado Nacex)','5','obligatorio'],
+        ['depcli','Departamento del cliente','10',''],
+        ['fecha','Fecha de la expedición con formato dd/MM/aaaa','10','obligatorio'],
+        ['cobro','Código de Cobro Nacex (<a href="es.codigos.html#cobros">ver cobros</a>)','1','obligatorio'],
+        ['servicio','Código de Servicio Nacex(<a href="es.codigos.html#serviciosN">ver servicios</a>)','2','obligatorio'],
+        ['excesos','Número de Excesos','3',''],
+        ['referencia','Referencia del cliente (Multireferencia separando por ; )','20',''],
+        ['envase','Código de envase Nacex (<a href="es.codigos.html#envasesN">ver envases</a>)','3','obligatorio'],
+        ['bultos','Número de bultos (Ej. Para 5 bultos, 005)','3','obligatorio'],
+        ['peso','Peso en Kilos','5.3','obligatorio'],
+        ['nomrec','Nombre de recogida','35','obligatorio'],
+        ['dirrec','Dirección de recogida','60','obligatorio'],
+        ['cprec','Código postal recogida (Ej. 08902)','8','obligatorio'],
+        ['pobrec','Población de recogida','30','obligatorio'],
+        ['telrec','Teléfono de recogida','35','obligatorio'],
+        ['noment','Nombre de entrega','35','obligatorio'],
+        ['dirent','Dirección de entrega','60','obligatorio'],
+        ['cpent','Código postal entrega (Ej. 08902)','5','obligatorio'],
+        ['pobent','Población de entrega','30','obligatorio'],
+        ['telent','Teléfono de entrega','15','obligatorio'],
+        ['obs"n"','Observaciones de recogida, hasta 3 ','38 x3',''],
+        ['obs"n"_e','Observaciones de entrega, hasta 2 1','38 x2',''],
+        ['sc_ret','Envío con retorno (S / N)','1',''],
+        ['sc_gestion','Código de gestión ó Trámite, (<a href="es.codigos.html#gestion">ver gestión/trámite</a>)','1',''],
+        ['sc_ok15','Confirmación Ok. 15 minutos (S / N)','1',''],
+
+        ['alerta_tipo','Servicio complementario: Tipo Alerta','1',''],
+        ['alerta_destino','Servicio complementario: Destino Alerta','50',''],
+
+            ['alto','Alto del paquete en CM.','3',''],
+              ['ancho','Ancho del paquete en CM.','3',''],
+              ['largo','Largo del paquete en CM.','3',''],
+        ['contenido','Contenido  (Obligatorio si se trata de un envío internacional)','80',''],
+
+        ['dig_tipo','Código para digitalización o almacenaje de albaranes de cliente, (<a href="es.codigos.html#albCLientes">ver códigos</a>)','1',''],
+        ['dig_num_alb','Servicio complementario: Número de copias a escanear, si el número de copia es cero, se indica como 00','2',''],
+
+        ['sc_ree_tipo','Código de reembolso o adelanto Nacex (<a href="es.codigos.html#ree_ade">ver reembolsos/adelanto</a>)','1',''],
+        ['sc_ree_importe','Servicio complementario: Importe de reembolso','5.3',''],
+
+        ['sc_prealer"n"_tip_ent','Tipo de prealerta entrega, hasta 5 prealertas, (<a href="es.codigos.html#tprealerta">ver tipos</a>)','1 x5',''],
+        ['sc_prealer"n"_des_ent','Modos de prealerta entrega, hasta 5 prealertas, (<a href="es.codigos.html#mprealerta">ver modos</a>)','50 x5',''],
+        ['sc_prealer"n"_plt_ent','Plantilla Prealerta entrega 1','1 x5',''],
+        ['sc_prealer"n"_msg_ent','Mensaje Prealerta entrega 1','195 x5',''],
+
+        ['sc_prealer_tip_rec','Tipo de prealertas recogida, hasta 5 prealertas, (<a href="es.codigos.html#tprealerta">ver tipos</a>)','1',''],
+        ['sc_prealer_des_rec','Modos de prealerta recogida, hasta 5 prealertas, (<a href="es.codigos.html#mprealerta">ver modos</a>)','50',''],
+        ['sc_prealer_plt_rec','Plantilla Prealerta recogida','1',''],
+        ['sc_prealer_msg_rec','Mensaje Prealerta recogida Mensaje','195',''],
+
+        ['hora_ini1','Horario de recogida inicial de mañanas con formato hh:mm','5','obligatorio'],
+        ['hora_fin1','Horario de recogida final de mañanas con formato hh:mm','5','obligatorio'],
+        ['hora_ini2','Horario de recogida inicial de tardes con formato hh:mm','5',''],
+        ['hora_fin2','Horario de recogida final de tardes con formato hh:mm','5',''],
+
+        ['vehiculo','Vehículo recogida (C = coche / M: Moto)','1','obligatorio'],
+        ['solicitante','Solicitante de la recogida','35','obligatorio'],
+        ['email_solicitante','Email del solicitante de la recogida','50','obligatorio'],
+
+        ['ins_rec"n"','Línea de instrucciones adicionales de recogida, hasta 15','40 x15',''],
+
+        ['ins_ent"n"','Línea de instrucciones adicionales de entrega, hasta 15','40 x15',''],
+
+        ['sc_seg_tipo','Código del tipo de Seguro, (<a href="es.codigos.html#seguros">ver seguros</a>)','1',''],
+        ['sc_seg_importe','Importe del seguro','5.3',''],
+
+        ['cam_serv','Para permitir un cambio de servicio para forzar la validez de la expedición será necesario informar este parámetro con los posibles valores S ó N','1',''],
+        ['shop_codigo','Código del punto de entrega NacexShop','6',''],
+
+        ['paisent','Codigo Alfa-2 ISO 3166-1 de país de entrega','2',''],
+        ['paisrec','Codigo Alfa-2 ISO 3166-1  de país de recogida','2',''],
+        ['acepto_km','Para autorizar recogidas con kilómetros (S/N)','1',''],
+        ['frec_codigo','Código de frecuencia para servicios Interdía y Puente Urbano, (<a href="es.codigos.html#frecuencia">ver frecuencias</a>)','1',''],
+        ['con_rec','Persona de contacto de recogida','35','']
+        ];
+
+
+method.salida=[
+              'El código es numérico de 10 dígitos. (Se entrega en blanco)',
+              'Devuelve el número de recogida en formato AAAA/NNNNNNNN Donde: AAAA = Código de agencia que solicita la recogida y NNNNNNNN = Número de recogida',
+              'Fecha prevista de recogida (DD-MM-AAAA)',
+              'Parámetros modificados necesarios para poder documentar esta recogida. Se indicarían como parejas clave=valor separados por pipe.'
+            ];
+
+method.gets= [
+            urlWS+'method=putRecogida&data=delcli=9992|numcli=00003|fecha=13/09/2019|cobro=T|servicio=08|referencia=refreco|envase=2|bultos=1|peso=5|nomrec=Empresa%20Nacex|dirrec=direccion%20recogida,%2064%201º2º|cprec=08908|pobrec=Hospitalet%20de%20Llobregat|telrec=654654654|noment=Ismael%20Tejón|dirent=Direccion%20entrega%20exnvío,%20987|cpent=08830|pobent=Sant%20Boi%20de%20Llobregat|telent=934561212|hora_ini1=09:00|hora_fin1=14:00|vehiculo=C|solicitante=Ismael%20Tejón|email_solicitante=email@nacex.es|con_rec=Recepción'+credencialesWS,
+            'No disponible'
+            ];
+method.GetResp=[
+              '|0001/784503|13/09/2019|'
+              ];

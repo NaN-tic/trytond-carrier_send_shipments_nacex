@@ -2,15 +2,12 @@
 #this repository contains the full copyright notices and license terms.
 import requests
 
-def nacex_url(debug=False):
-    if debug:
-        return 'http://pda.nacex.com:80/nacex_ws/ws'
-    else:
-        return 'http://gprs.nacex-webservice.com:80/nacex_ws/ws'
+def nacex_url():
+    return 'http://pda.nacex.com:80/nacex_ws/ws'
 
 def nacex_call(api, method, data):
     url = '%s?method=%s&user=%s&pass=%s&data=%s' % (
-        nacex_url(api.debug),
+        nacex_url(),
         method, api.username,
         api.password,
         nacex_data(data))

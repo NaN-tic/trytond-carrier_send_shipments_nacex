@@ -64,7 +64,9 @@ class CarrierApi(metaclass=PoolMeta):
     @classmethod
     def test_nacex(cls, api):
         'Test Nacex connection'
-        resp = nacex_call(api, 'getAgencia', '08200')
+        data = {}
+        data['cp'] = '08200'
+        resp = nacex_call(api, 'getAgencia', data)
         raise UserError(gettext(
                 'carrier_send_shipments_nacex.msg_nacex_test_connection',
                 message=resp.text))

@@ -193,17 +193,23 @@ class ShipmentOut(metaclass=PoolMeta):
                 continue
 
             if api.nacex_print == 'IMAGEN_B':
-                content = base64.urlsafe_b64decode(
-                    resp.text + '=' * (4 - len(resp.text) % 4))
+                try:
+                    content = base64.urlsafe_b64decode(
+                        resp.text + '=' * (4 - len(resp.text) % 4))
+                except TypeError:
+                    continue
                 suffix = '.png'
             else:
-                content = resp.text
+                try:
+                    content = resp.text.encode()
+                except AttributeError:
+                    continue
                 suffix = None
 
             with tempfile.NamedTemporaryFile(
                     prefix='%s-nacex-%s-%s-' % (dbname, agencia, numero),
                     suffix=suffix, delete=False) as temp:
-                temp.write(content.encode())
+                temp.write(content)
             logger.info(
                 'Generated tmp label %s' % (temp.name))
             temp.close()

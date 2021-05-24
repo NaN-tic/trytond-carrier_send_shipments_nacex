@@ -33,7 +33,7 @@ class ShipmentOut(metaclass=PoolMeta):
         return None
 
     @classmethod
-    def send_nacex(self, api, shipments):
+    def send_nacex(cls, api, shipments):
         '''
         Send shipments out to nacex
         :param api: obj
@@ -147,7 +147,7 @@ class ShipmentOut(metaclass=PoolMeta):
             reference = values[1]
 
             if reference:
-                self.write([shipment], {
+                cls.write([shipment], {
                     'carrier_tracking_ref': reference,
                     'carrier_service': service,
                     'carrier_delivery': True,
@@ -159,12 +159,14 @@ class ShipmentOut(metaclass=PoolMeta):
             else:
                 logger.error('Not send shipment %s.' % (shipment.number))
 
-            labels += self.print_labels_nacex(api, [shipment])
+            labels += cls.print_labels_nacex(api, [shipment])
+            if labels:
+                cls.write(shipments, {'carrier_printed': True})
 
         return references, labels, errors
 
     @classmethod
-    def print_labels_nacex(self, api, shipments):
+    def print_labels_nacex(cls, api, shipments):
         '''
         Get labels from shipments out from Nacex
         '''
@@ -215,6 +217,11 @@ class ShipmentOut(metaclass=PoolMeta):
             temp.close()
             labels.append(temp.name)
 
-        self.write(shipments, {'carrier_printed': True})
-
         return labels
+
+    @classmethod
+    def get_labels_nacex(cls, api, shipments):
+        binary_label = []
+        for label in cls.print_labels_nacex(api, shipments):
+            binary_label.append(fields.Binary.cast(open(label, "rb").read()))
+        return binary_label

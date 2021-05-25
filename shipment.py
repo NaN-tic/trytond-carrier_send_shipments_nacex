@@ -19,17 +19,17 @@ logger = logging.getLogger(__name__)
 
 class ShipmentOut(metaclass=PoolMeta):
     __name__ = 'stock.shipment.out'
-    nacex_envalse = fields.Selection('get_nacex_envalse', 'Nacex Envalse')
+    nacex_envase = fields.Selection('get_nacex_envase', 'Nacex Envase')
 
     @staticmethod
-    def get_nacex_envalse():
+    def get_nacex_envase():
         Api = Pool().get('carrier.api')
         selection = Api.fields_get(
-            ['nacex_envalse'])['nacex_envalse']['selection']
+            ['nacex_envase'])['nacex_envase']['selection']
         return [(None, '')] + selection
 
     @staticmethod
-    def default_nacex_envalse():
+    def default_nacex_envase():
         return None
 
     @classmethod
@@ -102,7 +102,7 @@ class ShipmentOut(metaclass=PoolMeta):
             data['tip_ser'] = service.code
             data['tip_cob'] = 'T' # TODO
             data['ref_cli'] = code[:20]
-            data['tip_env'] = shipment.nacex_envalse or api.nacex_envalse or '2'
+            data['tip_env'] = shipment.nacex_envase or api.nacex_envase or '2'
             data['bul'] = packages
             data['kil'] = str(weight)
             data['nom_rec'] = unaccent(api.company.party.name)[:35]

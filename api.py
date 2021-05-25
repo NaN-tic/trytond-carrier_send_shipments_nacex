@@ -25,13 +25,13 @@ class CarrierApi(metaclass=PoolMeta):
     nacex_hora_fin1 = fields.Char('hora_fin1')
     nacex_hora_ini2 = fields.Char('hora_ini2')
     nacex_hora_fin2 = fields.Char('hora_fin2')
-    nacex_envalse = fields.Selection([
+    nacex_envase = fields.Selection([
         ('0', 'Docs'),
         ('1', 'Bag'),
         ('2', 'Pag'),
         ('D', 'Documents'),
         ('M', 'Muestras'),
-        ], 'Envalse')
+        ], 'Envase')
     nacex_print = fields.Selection([
         ('TECSV4_B', 'TECSV4'),
         ('TECFV4_B', 'TECFV4'),
@@ -40,7 +40,7 @@ class CarrierApi(metaclass=PoolMeta):
         ], 'Print')
 
     @staticmethod
-    def default_nacex_envalse():
+    def default_nacex_envase():
         return '2'
 
     @staticmethod

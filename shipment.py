@@ -173,6 +173,7 @@ class ShipmentOut(metaclass=PoolMeta):
         labels = []
         dbname = Transaction().database.name
 
+        to_write = []
         for shipment in shipments:
             reference = shipment.carrier_tracking_ref
             if not reference:
@@ -217,6 +218,12 @@ class ShipmentOut(metaclass=PoolMeta):
             temp.close()
             labels.append(temp.name)
 
+            to_write.extend(([shipment], {
+                    'carrier_tracking_label': fields.Binary.cast(
+                        open(temp.name, "rb").read()),
+                    }))
+        if to_write:
+            cls.write(*to_write)
         return labels
 
     @classmethod

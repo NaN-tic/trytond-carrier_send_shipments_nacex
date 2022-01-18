@@ -94,7 +94,6 @@ class ShipmentOut(metaclass=PoolMeta):
                         gettext('carrier_send_shipments_nacex.msg_missing_warehouse_address'))
                 waddress = waddresses[0]
 
-            # TODO upgrade 6.0 rename zip to postal_code
             data = {}
             data['del_cli'] = api.nacex_delegacion[:4]
             data['num_cli'] = api.nacex_abonado[:5]
@@ -107,7 +106,7 @@ class ShipmentOut(metaclass=PoolMeta):
             data['kil'] = str(weight)
             data['nom_rec'] = unaccent(api.company.party.name)[:35]
             data['dir_rec'] = unaccent(waddress.street)[:60].rstrip()
-            data['cp_rec'] = unaccent(waddress.zip)[:8]
+            data['cp_rec'] = unaccent(waddress.postal_code)[:8]
             data['pob_rec'] = unaccent(waddress.city)[:30]
             data['pais_rec'] = unaccent(waddress.country and waddress.country.code or '')
             data['tel_rec'] = unspaces(api.phone or shipment.company.party.phone or '')[:35]
@@ -115,7 +114,7 @@ class ShipmentOut(metaclass=PoolMeta):
             data['per_ent'] = unaccent((shipment.delivery_address.party_name
                     or shipment.customer.name))[:35]
             data['dir_ent'] = unaccent(shipment.delivery_address.street)[:60].rstrip()
-            data['cp_ent'] = unaccent(shipment.delivery_address.zip)[:60]
+            data['cp_ent'] = unaccent(shipment.delivery_address.postal_code)[:60]
             data['pob_ent'] = unaccent(shipment.delivery_address.city)[:30]
             data['pais_ent'] = unaccent(shipment.delivery_address.country
                 and shipment.delivery_address.country.code or '')

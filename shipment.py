@@ -53,14 +53,17 @@ class ShipmentOut(metaclass=PoolMeta):
         default_service = CarrierApi.get_default_carrier_service(api)
 
         for shipment in shipments:
-            service = shipment.carrier_service or shipment.carrier.service or default_service
+            service = (shipment.carrier_service or shipment.carrier.service or
+                default_service)
             if not service:
-                message = gettext('carrier_send_shipments_nacex.msg_nacex_add_services')
+                message = gettext(
+                    'carrier_send_shipments_nacex.msg_nacex_add_services')
                 errors.append(message)
                 continue
 
             if api.reference_origin and hasattr(shipment, 'origin'):
-                code = shipment.origin and shipment.origin.rec_name or shipment.number
+                code = (shipment.origin and shipment.origin.rec_name or
+                    shipment.number)
             else:
                 code = shipment.number
 
@@ -90,8 +93,9 @@ class ShipmentOut(metaclass=PoolMeta):
             else:
                 waddresses = api.company.party.addresses
                 if not waddresses:
-                    raise UserError(
-                        gettext('carrier_send_shipments_nacex.msg_missing_warehouse_address'))
+                    raise UserError(gettext(
+                            'carrier_send_shipments_nacex.'
+                            'msg_missing_warehouse_address'))
                 waddress = waddresses[0]
 
             # TODO upgrade 6.0 rename zip to postal_code
@@ -100,7 +104,7 @@ class ShipmentOut(metaclass=PoolMeta):
             data['num_cli'] = api.nacex_abonado[:5]
             data['fec'] = Date.today().strftime("%d/%m/%Y")
             data['tip_ser'] = service.code
-            data['tip_cob'] = 'T' # TODO
+            data['tip_cob'] = 'T'  # TODO
             data['ref_cli'] = code[:20]
             data['tip_env'] = shipment.nacex_envase or api.nacex_envase or '2'
             data['bul'] = packages
@@ -109,17 +113,21 @@ class ShipmentOut(metaclass=PoolMeta):
             data['dir_rec'] = unaccent(waddress.street)[:60].rstrip()
             data['cp_rec'] = unaccent(waddress.zip)[:8]
             data['pob_rec'] = unaccent(waddress.city)[:30]
-            data['pais_rec'] = unaccent(waddress.country and waddress.country.code or '')
-            data['tel_rec'] = unspaces(api.phone or shipment.company.party.phone or '')[:35]
+            data['pais_rec'] = unaccent(waddress.country and
+                waddress.country.code or '')
+            data['tel_rec'] = unspaces(api.phone or
+                shipment.company.party.phone or '')[:35]
             data['nom_ent'] = unaccent(shipment.customer.name)[:35]
-            data['per_ent'] = unaccent((shipment.delivery_address.party_name
-                    or shipment.customer.name))[:35]
-            data['dir_ent'] = unaccent(shipment.delivery_address.street)[:60].rstrip()
+            data['per_ent'] = unaccent(shipment.delivery_address.party_name
+                    or shipment.customer.name)[:35]
+            data['dir_ent'] = unaccent(
+                shipment.delivery_address.street)[:60].rstrip()
             data['cp_ent'] = unaccent(shipment.delivery_address.zip)[:60]
             data['pob_ent'] = unaccent(shipment.delivery_address.city)[:30]
             data['pais_ent'] = unaccent(shipment.delivery_address.country
                 and shipment.delivery_address.country.code or '')
-            data['tel_ent'] = unspaces(shipment.customer.mobile or shipment.customer.phone or '')[:15]
+            data['tel_ent'] = unspaces(shipment.customer.mobile or
+                shipment.customer.phone or '')[:15]
             if shipment.carrier_notes:
                 data['obs1'] = unaccent(shipment.carrier_notes)[:38].rstrip()
 
@@ -127,14 +135,16 @@ class ShipmentOut(metaclass=PoolMeta):
             values = resp.text.split('|')
 
             if len(values) == 1 or resp.status_code != 200:
-                message = gettext('carrier_send_shipments_nacex.msg_nacex_connection_error',
+                message = gettext(
+                    'carrier_send_shipments_nacex.msg_nacex_connection_error',
                     name=shipment.rec_name,
                     error=resp.text)
                 errors.append(message)
                 continue
 
             if values[0] == 'ERROR':
-                message = gettext('carrier_send_shipments_nacex.msg_nacex_not_send_error',
+                message = gettext(
+                    'carrier_send_shipments_nacex.msg_nacex_not_send_error',
                     name=shipment.rec_name,
                     error=resp.text)
                 errors.append(message)
@@ -152,7 +162,8 @@ class ShipmentOut(metaclass=PoolMeta):
                     'carrier_service': service,
                     'carrier_delivery': True,
                     'carrier_send_date': ShipmentOut.get_carrier_date(),
-                    'carrier_send_employee': ShipmentOut.get_carrier_employee() or None,
+                    'carrier_send_employee': (
+                        ShipmentOut.get_carrier_employee() or None),
                     })
                 logger.info('Send shipment %s' % (shipment.number))
                 references.append(shipment.number)

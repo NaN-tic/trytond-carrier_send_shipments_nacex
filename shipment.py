@@ -198,7 +198,7 @@ class ShipmentOut(metaclass=PoolMeta):
             data = {}
             data['agencia'] = agencia
             data['numero'] = numero
-            data['modelo'] = api.nacex_print
+            data['modelo'] = api.print_report
 
             resp = nacex_call(api, 'getEtiqueta', data)
             values = resp.text.split('|')
@@ -206,7 +206,7 @@ class ShipmentOut(metaclass=PoolMeta):
             if resp.status_code != 200 or values[0] == 'ERROR':
                 continue
 
-            if api.nacex_print == 'IMAGEN_B':
+            if api.print_report == 'IMAGEN_B':
                 try:
                     content = base64.urlsafe_b64decode(
                         resp.text + '=' * (4 - len(resp.text) % 4))

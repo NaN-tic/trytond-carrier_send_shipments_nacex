@@ -32,20 +32,21 @@ class CarrierApi(metaclass=PoolMeta):
         ('D', 'Documents'),
         ('M', 'Muestras'),
         ], 'Envase')
-    nacex_print = fields.Selection([
-        ('TECSV4_B', 'TECSV4'),
-        ('TECFV4_B', 'TECFV4'),
-        ('ZEBRA_B', 'ZEBRA'),
-        ('IMAGEN_B', 'IMAGEN'),
-        ], 'Print')
+
+    @classmethod
+    def __setup__(cls):
+        super(CarrierApi, cls).__setup__()
+        nacex_print = [
+            ('TECSV4_B', 'Nacex TECSV4'),
+            ('TECFV4_B', 'Nacex TECFV4'),
+            ('ZEBRA_B', 'Nacex ZEBRA'),
+            ('IMAGEN_B', 'Nacex IMAGEN'),
+            ]
+        cls.print_report.selection.extend(nacex_print)
 
     @staticmethod
     def default_nacex_envase():
         return '2'
-
-    @staticmethod
-    def default_nacex_print():
-        return 'IMAGEN_B'
 
     @classmethod
     def get_carrier_app(cls):

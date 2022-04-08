@@ -19,8 +19,6 @@ copyright notices and license terms. -->
             <field name="nacex_hora_fin2"/>
             <label name="nacex_envase"/>
             <field name="nacex_envase"/>
-            <label name="nacex_print"/>
-            <field name="nacex_print"/>
         </page>
     </xpath>
 </data>

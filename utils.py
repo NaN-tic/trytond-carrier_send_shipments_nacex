@@ -2,16 +2,15 @@
 #this repository contains the full copyright notices and license terms.
 import requests
 
-def nacex_url():
-    return 'http://pda.nacex.com:80/nacex_ws/ws'
 
 def nacex_call(api, method, data):
     url = '%s?method=%s&user=%s&pass=%s&data=%s' % (
-        nacex_url(),
+        api.url,
         method, api.username,
         api.password,
         nacex_data(data))
     return requests.get(url)
+
 
 def nacex_data(data):
     return '|'.join(['%s=%s' % (key, value) for (key, value) in data.items()])

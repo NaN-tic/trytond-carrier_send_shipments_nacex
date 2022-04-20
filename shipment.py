@@ -110,7 +110,8 @@ class ShipmentOut(metaclass=PoolMeta):
             data['bul'] = packages
             data['kil'] = str(weight)
             data['nom_rec'] = unaccent(api.company.party.name)[:35]
-            data['dir_rec'] = unaccent(waddress.street)[:60].rstrip()
+            data['dir_rec'] = unaccent(waddress.street.replace('\n', ' - ')
+                )[:60].rstrip()
             data['cp_rec'] = unaccent(waddress.zip)[:8]
             data['pob_rec'] = unaccent(waddress.city)[:30]
             data['pais_rec'] = unaccent(waddress.country and
@@ -121,7 +122,8 @@ class ShipmentOut(metaclass=PoolMeta):
             data['per_ent'] = unaccent(shipment.delivery_address.party_name
                     or shipment.customer.name)[:35]
             data['dir_ent'] = unaccent(
-                shipment.delivery_address.street)[:60].rstrip()
+                shipment.delivery_address.street.replace('\n', ' - ')
+                )[:60].rstrip()
             data['cp_ent'] = unaccent(shipment.delivery_address.zip)[:60]
             data['pob_ent'] = unaccent(shipment.delivery_address.city)[:30]
             data['pais_ent'] = unaccent(shipment.delivery_address.country

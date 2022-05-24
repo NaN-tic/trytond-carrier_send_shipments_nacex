@@ -174,8 +174,8 @@ class ShipmentOut(metaclass=PoolMeta):
                 logger.error('Not send shipment %s.' % (shipment.number))
 
             labels += cls.print_labels_nacex(api, [shipment])
-            if labels:
-                cls.write(shipments, {'carrier_printed': True})
+        if labels:
+            cls.write(shipments, {'carrier_printed': True})
 
         return references, labels, errors
 

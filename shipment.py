@@ -36,7 +36,7 @@ class ShipmentOut(metaclass=PoolMeta):
         return None
 
     @staticmethod
-    def default_set_pickup_address():
+    def default_nacex_set_pickup_address():
         return False
 
     @classmethod

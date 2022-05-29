@@ -38,6 +38,18 @@ msgctxt "field:stock.shipment.out,nacex_envase:"
 msgid "Nacex Envase"
 msgstr "Nacex Envase"
 
+msgctxt "field:stock.shipment.out,nacex_set_pickup_address:"
+msgid "Nacex Set Pickup Address"
+msgstr "Nacex fijar dirección recogida"
+
+msgctxt "help:stock.shipment.out,nacex_set_pickup_address:"
+msgid ""
+"NACEX: Set to true, if the warehouse address is differnet from the one "
+"setted in Nacex register as pickup."
+msgstr ""
+"NACEX: Marcar si la dirección del alamcén es distinta a la establecida "
+"en el registro de Nacex como dirección de recogida."
+
 msgctxt "model:ir.message,text:msg_missing_warehouse_address"
 msgid "Missing warehouse address"
 msgstr "Falta la dirección del almacén"

@@ -20,6 +20,9 @@ logger = logging.getLogger(__name__)
 class ShipmentOut(metaclass=PoolMeta):
     __name__ = 'stock.shipment.out'
     nacex_envase = fields.Selection('get_nacex_envase', 'Nacex Envase')
+    nacex_set_pickup_address = fields.Boolean('Nacex Set Pickup Address',
+        help="NACEX: Set to true, if the warehouse address is differnet from "
+            "the one setted in Nacex register as pickup.")
 
     @staticmethod
     def get_nacex_envase():
@@ -31,6 +34,10 @@ class ShipmentOut(metaclass=PoolMeta):
     @staticmethod
     def default_nacex_envase():
         return None
+
+    @staticmethod
+    def default_set_pickup_address():
+        return False
 
     @classmethod
     def send_nacex(cls, api, shipments):
@@ -103,21 +110,24 @@ class ShipmentOut(metaclass=PoolMeta):
             data['num_cli'] = api.nacex_abonado[:5]
             data['fec'] = Date.today().strftime("%d/%m/%Y")
             data['tip_ser'] = service.code
-            data['tip_cob'] = 'T'  # TODO
+            # TODO: Tipo de cobro
+            #   'O', Origen: Factura la agencia origen del envío
+            #   'D', Destino: Factura la agencia de entrega del envío
+            #   'T': Tercera: Factura una tercera agencia
+            data['tip_cob'] = 'O'
             data['ref_cli'] = code[:20]
             data['tip_env'] = shipment.nacex_envase or api.nacex_envase or '2'
             data['bul'] = packages
             data['kil'] = str(weight)
-            data['nom_rec'] = unaccent(api.company.party.name)[:35]
-            data['dir_rec'] = unaccent(waddress.street)[:60].rstrip()
-            data['dir_rec'] = unaccent(waddress.street.replace('\n', ' - ')
-                )[:60].rstrip()
-            data['cp_rec'] = unaccent(waddress.postal_code)[:8]
-            data['pob_rec'] = unaccent(waddress.city)[:30]
-            data['pais_rec'] = unaccent(waddress.country and
-                waddress.country.code or '')
-            data['tel_rec'] = unspaces(api.phone or
-                shipment.company.party.phone or '')[:35]
+            if shipment.nacex_set_pickup_address:
+                data['dir_rec'] = unaccent(waddress.street.replace('\n', ' - ')
+                    )[:60].rstrip()
+                data['cp_rec'] = unaccent(waddress.postal_code)[:8]
+                data['pob_rec'] = unaccent(waddress.city)[:30]
+                data['pais_rec'] = unaccent(waddress.country and
+                    waddress.country.code or '')
+                data['tel_rec'] = unspaces(api.phone or
+                    shipment.company.party.phone or '')[:35]
             data['nom_ent'] = unaccent(shipment.customer.name)[:35]
             data['per_ent'] = unaccent((shipment.delivery_address.party_name
                     or shipment.customer.name))[:35]

@@ -6,4 +6,9 @@ this repository contains the full copyright notices and license terms. -->
         <label name="nacex_envase"/>
         <field name="nacex_envase"/>
     </xpath>
+
+    <xpath expr="/form/field[@name='warehouse']" position="after">
+        <label name="nacex_set_pickup_address"/>
+        <field name="nacex_set_pickup_address"/>
+    </xpath>
 </data>

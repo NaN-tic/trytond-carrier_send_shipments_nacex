@@ -1,13 +1,18 @@
 #This file is part of nacex. The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
 import requests
+import hashlib
 
 
 def nacex_call(api, method, data):
+
+    password = api.password
+    if isinstance(password, str):
+        password = password.encode('utf-8')
     url = '%s?method=%s&user=%s&pass=%s&data=%s' % (
         api.url,
         method, api.username,
-        api.password,
+        hashlib.md5(password).hexdigest(),
         nacex_data(data))
     return requests.get(url)
 

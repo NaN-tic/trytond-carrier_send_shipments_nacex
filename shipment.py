@@ -22,6 +22,20 @@ class NacexMixin(ModelSQL, ModelView):
     nacex_set_pickup_address = fields.Boolean('Nacex Set Pickup Address',
         help="NACEX: Set to true, if the warehouse address is differnet from "
             "the one setted in Nacex register as pickup.")
+    nacex_tip_ea = fields.Selection([
+        (None, ''),
+        ('N', 'Without ealerta'),
+        ('S', 'Ealerta informed by SMS'),
+        ('E', 'Ealerta informed by EMAIL'),
+        ], 'Nacex Type eAlerta', sort=False)
+    nacex_ealerta = fields.Char('Nacex eAlerta')
+    nacex_frec_codigo = fields.Selection([
+        (None, ''),
+        ('1', 'Interdia or Puente Urbano: morning'),
+        ('2', 'Interdia or Puente Urbano: late'),
+        ('8', 'Puente urbano night'),
+        ('9', 'Interdia aerial'),
+        ], 'Nacex Freq Codigo', sort=False)
 
     @staticmethod
     def get_nacex_envase():
@@ -37,6 +51,21 @@ class NacexMixin(ModelSQL, ModelView):
     @staticmethod
     def default_nacex_set_pickup_address():
         return False
+
+    @staticmethod
+    def default_nacex_tip_ea():
+        return None
+
+    @staticmethod
+    def default_nacex_frec_codigo():
+        return None
+
+    @fields.depends('nacex_tip_ea', 'customer')
+    def on_change_nacex_tip_ea(self):
+        if self.nacex_tip_ea == 'S':
+            self.nacex_ealerta = self.customer.mobile
+        if self.nacex_tip_ea == 'E':
+            self.nacex_ealerta = self.customer.email
 
     @classmethod
     def nacex_label_file(cls, api, dbname, agencia, numero, api_label):
@@ -144,6 +173,23 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
             data['tip_env'] = shipment.nacex_envase or api.nacex_envase or '2'
             data['bul'] = str(packages)[:3].zfill(3)
             data['kil'] = str(weight)
+
+            # 1	Interdia or Puente Urbano: frequency 1 (morning)
+            # 2	Interdia or Puente Urbano: frequency 2 (late)
+            # 8	Puente urbano night.
+            # 9	Interdía aerial.
+            if shipment.nacex_frec_codigo:
+                data['frec_codigo'] = shipment.nacex_frec_codigo
+
+            # N	Without ealerta.
+            # S	Ealerta informed by SMS.
+            # E	Ealerta informed by EMAIL.
+            data['tip_ea'] = shipment.nacex_tip_ea or 'N'
+            if shipment.nacex_tip_ea == 'S' and shipment.nacex_ealerta:
+                data['ealerta'] = shipment.nacex_ealerta
+            elif shipment.nacex_tip_ea == 'E' and shipment.nacex_ealerta:
+                data['ealerta'] = shipment.nacex_ealerta
+
             if shipment.nacex_set_pickup_address:
                 data['dir_rec'] = unaccent(waddress.street.replace('\n', ' - ')
                     )[:60].rstrip()

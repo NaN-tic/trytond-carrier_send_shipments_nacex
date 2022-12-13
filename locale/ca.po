@@ -38,6 +38,18 @@ msgctxt "field:stock.shipment.out,nacex_envase:"
 msgid "Nacex Envase"
 msgstr "Nacex Envase"
 
+msgctxt "field:stock.shipment.out,nacex_tip_ea:"
+msgid "Nacex Type eAlerta"
+msgstr "Nacex Tipus eAlerta"
+
+msgctxt "field:stock.shipment.out,nacex_ealerta:"
+msgid "Nacex eAlerta"
+msgstr "Nacex eAlerta"
+
+msgctxt "field:stock.shipment.out,nacex_frec_codigo:"
+msgid "Nacex Freq Codigo"
+msgstr "Nacex Freq Codigo"
+
 msgctxt "field:stock.shipment.out,nacex_set_pickup_address:"
 msgid "Nacex Set Pickup Address"
 msgstr "Nacex fixar direcció recollida"
@@ -113,6 +125,34 @@ msgstr "TECSV4"
 msgctxt "selection:carrier.api,nacex_print:"
 msgid "ZEBRA"
 msgstr "ZEBRA"
+
+msgctxt "selection:stock.shipment.out,nacex_frec_codigo:"
+msgid "Interdia or Puente Urbano: morning"
+msgstr "Interdia or Puente Urbano: matins"
+
+msgctxt "selection:stock.shipment.out,nacex_frec_codigo:"
+msgid "Interdia or Puente Urbano: late"
+msgstr "Interdia or Puente Urbano: tarda"
+
+msgctxt "selection:stock.shipment.out,nacex_frec_codigo:"
+msgid "Puente urbano night"
+msgstr "Puente urbano nit"
+
+msgctxt "selection:stock.shipment.out,nacex_frec_codigo:"
+msgid "Interdia aerial"
+msgstr "Interdia aerial"
+
+msgctxt "selection:stock.shipment.out,nacex_tip_ea:"
+msgid "Ealerta informed by EMAIL"
+msgstr "Ealerta email"
+
+msgctxt "selection:stock.shipment.out,nacex_tip_ea:"
+msgid "Ealerta informed by SMS"
+msgstr "Ealerta SMS"
+
+msgctxt "selection:stock.shipment.out,nacex_tip_ea:"
+msgid "Without ealerta"
+msgstr "Sense ealerta"
 
 msgctxt "view:carrier.api:"
 msgid "Nacex"

@@ -10,7 +10,6 @@ def register():
     Pool.register(
         api.CarrierApi,
         shipment.ShipmentOut,
-        shipment.ShipmentOutReturn,
         module='carrier_send_shipments_nacex', type_='model')
     Pool.register(
         manifest.CarrierManifest,

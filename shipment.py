@@ -5,7 +5,7 @@ import logging
 import tempfile
 import base64
 from trytond.pool import Pool, PoolMeta
-from trytond.model import ModelSQL, ModelView, fields
+from trytond.model import fields
 from trytond.transaction import Transaction
 from trytond.i18n import gettext
 from trytond.exceptions import UserError
@@ -17,7 +17,8 @@ __all__ = ['ShipmentOut']
 logger = logging.getLogger(__name__)
 
 
-class NacexMixin(ModelSQL, ModelView):
+class ShipmentOut(metaclass=PoolMeta):
+    __name__ = 'stock.shipment.out'
     nacex_envase = fields.Selection('get_nacex_envase', 'Nacex Envase')
     nacex_set_pickup_address = fields.Boolean('Nacex Set Pickup Address',
         help="NACEX: Set to true, if the warehouse address is differnet from "
@@ -66,32 +67,6 @@ class NacexMixin(ModelSQL, ModelView):
             self.nacex_ealerta = self.customer.mobile
         if self.nacex_tip_ea == 'E':
             self.nacex_ealerta = self.customer.email
-
-    @classmethod
-    def nacex_label_file(cls, api, dbname, agencia, numero, api_label):
-        if api.print_report == 'IMAGEN_B':
-            try:
-                content = base64.urlsafe_b64decode(
-                    api_label + '=' * (4 - len(api_label) % 4))
-            except TypeError:
-                return
-            suffix = '.png'
-        else:
-            try:
-                content = api_label.encode()
-            except AttributeError:
-                return
-            suffix = None
-
-        with tempfile.NamedTemporaryFile(
-                prefix='%s-nacex-%s-%s-' % (dbname, agencia, numero),
-                suffix=suffix, delete=False) as temp:
-            temp.write(content)
-        temp.close()
-        return temp.name
-
-class ShipmentOut(NacexMixin, metaclass=PoolMeta):
-    __name__ = 'stock.shipment.out'
 
     @classmethod
     def send_nacex(cls, api, shipments):
@@ -159,6 +134,7 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                             'msg_missing_warehouse_address'))
                 waddress = waddresses[0]
 
+            # TODO upgrade 6.0 rename zip to postal_code
             data = {}
             data['del_cli'] = api.nacex_delegacion[:4]
             data['num_cli'] = api.nacex_abonado[:5]
@@ -171,7 +147,7 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
             data['tip_cob'] = 'O'
             data['ref_cli'] = code[:20]
             data['tip_env'] = shipment.nacex_envase or api.nacex_envase or '2'
-            data['bul'] = str(packages)[:3].zfill(3)
+            data['bul'] = packages
             data['kil'] = str(weight)
 
             # 1	Interdia or Puente Urbano: frequency 1 (morning)
@@ -207,9 +183,8 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
             data['dir_ent'] = unaccent(
                 shipment.delivery_address.street.replace('\n', ' - ')
                 )[:60].rstrip()
-            # TODO upgrade 6.0 rename zip to postal_code
-            data['cp_ent'] = unaccent(shipment.delivery_address.zip)[:15]
-            data['pob_ent'] = unaccent(shipment.delivery_address.city)[:40]
+            data['cp_ent'] = unaccent(shipment.delivery_address.zip)[:60]
+            data['pob_ent'] = unaccent(shipment.delivery_address.city)[:30]
             data['pais_ent'] = unaccent(shipment.delivery_address.country
                 and shipment.delivery_address.country.code or '')
             data['tel_ent'] = unspaces(shipment.customer.mobile or
@@ -292,16 +267,33 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
             if resp.status_code != 200 or values[0] == 'ERROR':
                 continue
 
-            api_label = resp.text
-            temp_name = cls.nacex_label_file(api, dbname, agencia, numero, api_label)
-            if not temp_name:
-                continue
-            labels.append(temp_name)
+            if api.print_report == 'IMAGEN_B':
+                try:
+                    content = base64.urlsafe_b64decode(
+                        resp.text + '=' * (4 - len(resp.text) % 4))
+                except TypeError:
+                    continue
+                suffix = '.png'
+            else:
+                try:
+                    content = resp.text.encode()
+                except AttributeError:
+                    continue
+                suffix = None
+
+            with tempfile.NamedTemporaryFile(
+                    prefix='%s-nacex-%s-%s-' % (dbname, agencia, numero),
+                    suffix=suffix, delete=False) as temp:
+                temp.write(content)
+            logger.info(
+                'Generated tmp label %s' % (temp.name))
+            temp.close()
+            labels.append(temp.name)
 
             to_write.extend(([shipment], {
                 'carrier_printed': True,
                 'carrier_tracking_label': fields.Binary.cast(
-                    open(temp_name, "rb").read()),
+                    open(temp.name, "rb").read()),
                 }))
         if to_write:
             cls.write(*to_write)
@@ -313,148 +305,3 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
         for label in cls.print_labels_nacex(api, shipments):
             binary_label.append(fields.Binary.cast(open(label, "rb").read()))
         return binary_label
-
-
-class ShipmentOutReturn(NacexMixin, metaclass=PoolMeta):
-    __name__ = 'stock.shipment.out.return'
-
-    @classmethod
-    def send_nacex(cls, api, shipments):
-        '''
-        Send shipments out return to nacex
-        :param api: obj
-        :param shipments: list
-        Return references, labels, errors
-        '''
-        pool = Pool()
-        # CarrierApi = pool.get('carrier.api')
-        ShipmentOutReturn = pool.get('stock.shipment.out.return')
-        Uom = pool.get('product.uom')
-        Date = pool.get('ir.date')
-        Employee = pool.get('company.employee')
-
-        references = []
-        labels = []
-        errors = []
-
-        # default_service = CarrierApi.get_default_carrier_service(api)
-        dbname = Transaction().database.name
-
-        for shipment in shipments:
-            # service = (shipment.carrier_service or shipment.carrier.service or
-            #     default_service)
-            # if not service:
-            #     message = gettext(
-            #         'carrier_send_shipments_nacex.msg_nacex_add_services')
-            #     errors.append(message)
-            #     continue
-
-            if api.reference_origin and hasattr(shipment, 'origin'):
-                code = (shipment.origin and shipment.origin.rec_name or
-                    shipment.number)
-            else:
-                code = shipment.number
-
-            packages = shipment.number_packages
-            if not packages or packages == 0:
-                packages = 1
-
-            weight = 1
-            if api.weight and hasattr(shipment, 'weight_func'):
-                weight = shipment.weight_func
-                weight = 1 if weight == 0.0 else weight
-
-                if api.weight_api_unit:
-                    if shipment.weight_uom:
-                        weight = Uom.compute_qty(
-                            shipment.weight_uom, weight, api.weight_api_unit)
-                    elif api.weight_unit:
-                        weight = Uom.compute_qty(
-                            api.weight_unit, weight, api.weight_api_unit)
-
-                # weight is integer value, not float
-                weight = int(round(weight))
-                weight = 1 if weight == 0 else weight
-
-            if shipment.warehouse.address:
-                waddress = shipment.warehouse.address
-            else:
-                waddresses = api.company.party.addresses
-                if not waddresses:
-                    raise UserError(gettext(
-                            'carrier_send_shipments_nacex.'
-                            'msg_missing_warehouse_address'))
-                waddress = waddresses[0]
-
-            data = {}
-            data['del_cli'] = api.nacex_delegacion[:4]
-            data['num_cli'] = api.nacex_abonado[:5]
-
-            data['nom_rem'] = unaccent(shipment.customer.name)[:35]
-            data['fec'] = Date.today().strftime("%d/%m/%Y")
-            data['ref_cli'] = code[:20]
-            data['nom_ent'] = unaccent(api.company.party.name)[:50]
-            employee_id = ShipmentOutReturn.get_carrier_employee()
-            if employee_id:
-                employee = Employee(employee_id)
-                data['per_ent'] = unaccent(employee.rec_name)[:35]
-            data['dir_ent'] = unaccent(waddress.street.replace('\n', ' - ')
-                )[:60].rstrip()
-            # TODO upgrade 6.0 rename zip to postal_code
-            data['cp_ent'] = unaccent(waddress.zip)[:15]
-            data['pob_ent'] = unaccent(waddress.city)[:40]
-            data['pais_ent'] = unaccent(waddress.country and
-                waddress.country.code or '')
-            data['tel_ent'] = unspaces(api.phone or
-                shipment.company.party.phone or '')[:20]
-            if shipment.carrier_notes:
-                data['obs1'] = unaccent(shipment.carrier_notes)[:38].rstrip()
-
-            data['modelo'] = api.print_report
-
-            resp = nacex_call(api, 'genEtiquetaDevolucion', data)
-
-            values = resp.text.split('|', 1)
-
-            if len(values) == 1 or resp.status_code != 200:
-                message = gettext(
-                    'carrier_send_shipments_nacex.msg_nacex_connection_error',
-                    name=shipment.rec_name,
-                    error=resp.text)
-                errors.append(message)
-                continue
-
-            if values[0] == 'ERROR':
-                message = gettext(
-                    'carrier_send_shipments_nacex.msg_nacex_not_send_error',
-                    name=shipment.rec_name,
-                    error=resp.text)
-                errors.append(message)
-                continue
-
-            reference = values[0]
-            api_label = values[1]
-
-            if reference:
-                temp_name = cls.nacex_label_file(api, dbname, 'return', reference, api_label)
-                if not temp_name:
-                    continue
-                labels.append(temp_name)
-
-                cls.write([shipment], {
-                    'carrier_tracking_ref': reference,
-                    # 'carrier_service': service,
-                    # 'carrier_delivery': True,
-                    'carrier_send_date': ShipmentOutReturn.get_carrier_date(),
-                    'carrier_send_employee': (
-                        ShipmentOutReturn.get_carrier_employee() or None),
-                    'carrier_printed': True,
-                    'carrier_tracking_label': fields.Binary.cast(
-                        open(temp_name, "rb").read()),
-                    })
-                logger.info('Send shipment %s' % (shipment.number))
-                references.append(shipment.number)
-            else:
-                logger.error('Not send shipment %s.' % (shipment.number))
-
-        return references, labels, errors

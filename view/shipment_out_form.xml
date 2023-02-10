@@ -11,6 +11,10 @@ this repository contains the full copyright notices and license terms. -->
         <field name="nacex_ealerta"/>
         <label name="nacex_frec_codigo"/>
         <field name="nacex_frec_codigo"/>
+        <label name="nacex_ret"/>
+        <field name="nacex_ret"/>
+        <label name="nacex_ref_cli"/>
+        <field name="nacex_ref_cli"/>
     </xpath>
 
     <xpath expr="/form/field[@name='warehouse']" position="after">

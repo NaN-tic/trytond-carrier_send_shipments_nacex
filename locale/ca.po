@@ -50,6 +50,14 @@ msgctxt "field:stock.shipment.out,nacex_frec_codigo:"
 msgid "Nacex Freq Codigo"
 msgstr "Nacex Freq Codigo"
 
+msgctxt "field:stock.shipment.out,nacex_ref_cli:"
+msgid "Nacex Ref Cli"
+msgstr "Nacex Referencia"
+
+msgctxt "field:stock.shipment.out,nacex_ret:"
+msgid "Nacex Ret"
+msgstr "Nacex Retorn"
+
 msgctxt "field:stock.shipment.out,nacex_set_pickup_address:"
 msgid "Nacex Set Pickup Address"
 msgstr "Nacex fixar direcció recollida"

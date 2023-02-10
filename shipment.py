@@ -37,6 +37,11 @@ class ShipmentOut(metaclass=PoolMeta):
         ('8', 'Puente urbano night'),
         ('9', 'Interdia aerial'),
         ], 'Nacex Freq Codigo', sort=False)
+    nacex_ret = fields.Selection([
+        ('N', 'N'),
+        ('S', 'S'),
+        ], 'Nacex Ret', sort=False)
+    nacex_ref_cli = fields.Char('Nacex Ref Cli')
 
     @staticmethod
     def get_nacex_envase():
@@ -60,6 +65,10 @@ class ShipmentOut(metaclass=PoolMeta):
     @staticmethod
     def default_nacex_frec_codigo():
         return None
+
+    @staticmethod
+    def default_nacex_ret():
+        return 'N'
 
     @fields.depends('nacex_tip_ea', 'customer')
     def on_change_nacex_tip_ea(self):
@@ -145,10 +154,11 @@ class ShipmentOut(metaclass=PoolMeta):
             #   'D', Destino: Factura la agencia de entrega del envío
             #   'T': Tercera: Factura una tercera agencia
             data['tip_cob'] = 'O'
-            data['ref_cli'] = code[:20]
+            data['ref_cli'] = shipment.nacex_ref_cli and shipment.nacex_ref_cli[:20] or code[:20]
             data['tip_env'] = shipment.nacex_envase or api.nacex_envase or '2'
             data['bul'] = packages
             data['kil'] = str(weight)
+            data['nacex_ret'] = shipment.nacex_ret or 'N'
 
             # 1	Interdia or Puente Urbano: frequency 1 (morning)
             # 2	Interdia or Puente Urbano: frequency 2 (late)

@@ -144,7 +144,8 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
             weight = 1
             if api.weight and hasattr(shipment, 'manual_weight'):
                 weight = shipment.manual_weight or shipment.weight
-                weight = 1 if weight == 0.0 else weight
+                if not weight:
+                    weight = 1
 
                 if api.weight_api_unit:
                     if shipment.weight_uom:
@@ -154,7 +155,7 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                         weight = Uom.compute_qty(
                             api.weight_unit, weight, api.weight_api_unit)
 
-                # weight is integer value, not float
+                # weight must integer value, not float
                 weight = int(round(weight))
                 weight = 1 if weight == 0 else weight
 

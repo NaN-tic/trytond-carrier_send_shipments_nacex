@@ -20,14 +20,9 @@ logger = logging.getLogger(__name__)
 class NacexMixin(ModelSQL, ModelView):
     nacex_envase = fields.Selection('get_nacex_envase', 'Nacex Envase')
     nacex_set_pickup_address = fields.Boolean('Nacex Set Pickup Address',
-        help="NACEX: Set to true, if the warehouse address is differnet from "
+        help="NACEX: Set to true, if the warehouse address is different from "
             "the one setted in Nacex register as pickup.")
-    nacex_tip_ea = fields.Selection([
-        (None, ''),
-        ('N', 'Without ealerta'),
-        ('S', 'Ealerta informed by SMS'),
-        ('E', 'Ealerta informed by EMAIL'),
-        ], 'Nacex Type eAlerta', sort=False)
+    nacex_tip_ea = fields.Selection('get_nacex_tip_ea', 'Nacex Type eAlerta')
     nacex_ealerta = fields.Char('Nacex eAlerta')
     nacex_frec_codigo = fields.Selection([
         (None, ''),
@@ -50,16 +45,25 @@ class NacexMixin(ModelSQL, ModelView):
         return [(None, '')] + selection
 
     @staticmethod
+    def get_nacex_tip_ea():
+        pool = Pool()
+        Api = pool.get('carrier.api')
+
+        fieldname = 'nacex_tip_ea'
+        selection = Api.fields_get([fieldname])[fieldname]['selection']
+        return [(None, '')] + selection
+
+    @staticmethod
     def default_nacex_envase():
+        return None
+
+    @staticmethod
+    def default_nacex_tip_ea():
         return None
 
     @staticmethod
     def default_nacex_set_pickup_address():
         return False
-
-    @staticmethod
-    def default_nacex_tip_ea():
-        return None
 
     @staticmethod
     def default_nacex_frec_codigo():
@@ -71,10 +75,11 @@ class NacexMixin(ModelSQL, ModelView):
 
     @fields.depends('nacex_tip_ea', 'customer')
     def on_change_nacex_tip_ea(self):
-        if self.nacex_tip_ea == 'S':
-            self.nacex_ealerta = self.customer.mobile
-        if self.nacex_tip_ea == 'E':
-            self.nacex_ealerta = self.customer.email
+        if self.customer:
+            if self.nacex_tip_ea == 'S':
+                self.nacex_ealerta = self.customer.mobile
+            if self.nacex_tip_ea == 'E':
+                self.nacex_ealerta = self.customer.email
 
     @classmethod
     def nacex_label_file(cls, api, dbname, agencia, numero, api_label):
@@ -101,6 +106,41 @@ class NacexMixin(ModelSQL, ModelView):
 
 class ShipmentOut(NacexMixin, metaclass=PoolMeta):
     __name__ = 'stock.shipment.out'
+
+    @fields.depends('customer', 'nacex_tip_ea')
+    def on_change_customer(self):
+        super().on_change_customer()
+
+        if self.customer:
+            if self.nacex_tip_ea == 'S':
+                self.nacex_ealerta = self.customer.mobile
+            elif self.nacex_tip_ea == 'E':
+                self.nacex_ealerta = self.customer.email
+        else:
+            self.nacex_ealerta = None
+
+    @fields.depends('carrier', 'customer')
+    def on_change_carrier(self):
+        pool = Pool()
+        API = pool.get('carrier.api')
+
+        try:
+            super().on_change_carrier()
+        except AttributeError:
+            pass
+
+        if self.carrier:
+            apis = API.search([
+                    ('carriers', 'in', [self.carrier.id])
+                    ], limit=1)
+            if apis:
+                api, = apis
+                self.nacex_tip_ea = api.nacex_tip_ea
+            if self.customer:
+                if api.nacex_tip_ea == 'S':
+                    self.nacex_ealerta = self.customer.mobile
+                elif api.nacex_tip_ea == 'E':
+                    self.nacex_ealerta = self.customer.email
 
     @classmethod
     def send_nacex(cls, api, shipments):
@@ -223,8 +263,8 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                 and shipment.delivery_address.country.code or '')
             data['tel_ent'] = unspaces(shipment.customer.mobile or
                 shipment.customer.phone or '')[:15]
-            if shipment.carrier_notes:
-                data['obs1'] = unaccent(shipment.carrier_notes)[:38].rstrip()
+            if shipment.carrier_note:
+                data['obs1'] = unaccent(shipment.carrier_note)[:38].rstrip()
 
             resp = nacex_call(api, 'putExpedicion', data)
             values = resp.text.split('|')

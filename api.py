@@ -32,6 +32,11 @@ class CarrierApi(metaclass=PoolMeta):
         ('D', 'Documents'),
         ('M', 'Muestras'),
         ], 'Envase')
+    nacex_tip_ea = fields.Selection([
+        ('N', 'Without ealerta'),
+        ('S', 'Ealerta informed by SMS'),
+        ('E', 'Ealerta informed by EMAIL'),
+        ], 'Nacex Type eAlerta', sort=False)
 
     @classmethod
     def __setup__(cls):
@@ -47,6 +52,10 @@ class CarrierApi(metaclass=PoolMeta):
     @staticmethod
     def default_nacex_envase():
         return '2'
+
+    @staticmethod
+    def default_nacex_tip_ea():
+        return 'N'
 
     @classmethod
     def get_carrier_app(cls):

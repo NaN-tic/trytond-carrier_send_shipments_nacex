@@ -19,8 +19,8 @@ msgid "hora_fin1"
 msgstr "hora_fin1"
 
 msgctxt "field:carrier.api,nacex_hora_fin2:"
-msgid "hora_ini1"
-msgstr "hora_ini1"
+msgid "hora_fin2"
+msgstr ""
 
 msgctxt "field:carrier.api,nacex_hora_ini1:"
 msgid "hora_ini1"
@@ -30,21 +30,17 @@ msgctxt "field:carrier.api,nacex_hora_ini2:"
 msgid "hora_ini2"
 msgstr "hora_ini2"
 
-msgctxt "field:carrier.api,nacex_print:"
-msgid "Print"
-msgstr "Imprimir"
-
-msgctxt "field:stock.shipment.out,nacex_envase:"
-msgid "Nacex Envase"
-msgstr "Nacex Envase"
-
-msgctxt "field:stock.shipment.out,nacex_tip_ea:"
+msgctxt "field:carrier.api,nacex_tip_ea:"
 msgid "Nacex Type eAlerta"
 msgstr "Nacex Tipo eAlerta"
 
 msgctxt "field:stock.shipment.out,nacex_ealerta:"
 msgid "Nacex eAlerta"
 msgstr "Nacex eAlerta"
+
+msgctxt "field:stock.shipment.out,nacex_envase:"
+msgid "Nacex Envase"
+msgstr "Nacex Envase"
 
 msgctxt "field:stock.shipment.out,nacex_frec_codigo:"
 msgid "Nacex Freq Codigo"
@@ -62,13 +58,53 @@ msgctxt "field:stock.shipment.out,nacex_set_pickup_address:"
 msgid "Nacex Set Pickup Address"
 msgstr "Nacex fijar dirección recogida"
 
+msgctxt "field:stock.shipment.out,nacex_tip_ea:"
+msgid "Nacex Type eAlerta"
+msgstr "Nacex Tipo eAlerta"
+
+msgctxt "field:stock.shipment.out.return,nacex_ealerta:"
+msgid "Nacex eAlerta"
+msgstr "Nacex eAlerta"
+
+msgctxt "field:stock.shipment.out.return,nacex_envase:"
+msgid "Nacex Envase"
+msgstr "Nacex Envase"
+
+msgctxt "field:stock.shipment.out.return,nacex_frec_codigo:"
+msgid "Nacex Freq Codigo"
+msgstr "Nacex Freq Codigo"
+
+msgctxt "field:stock.shipment.out.return,nacex_ref_cli:"
+msgid "Nacex Ref Cli"
+msgstr "Nacex Ref Cli"
+
+msgctxt "field:stock.shipment.out.return,nacex_ret:"
+msgid "Nacex Ret"
+msgstr "Nacex Retorno"
+
+msgctxt "field:stock.shipment.out.return,nacex_set_pickup_address:"
+msgid "Nacex Set Pickup Address"
+msgstr "Nacex fijar dirección recogida"
+
+msgctxt "field:stock.shipment.out.return,nacex_tip_ea:"
+msgid "Nacex Type eAlerta"
+msgstr "Nacex Tipo eAlerta"
+
 msgctxt "help:stock.shipment.out,nacex_set_pickup_address:"
 msgid ""
-"NACEX: Set to true, if the warehouse address is differnet from the one "
+"NACEX: Set to true, if the warehouse address is different from the one "
 "setted in Nacex register as pickup."
 msgstr ""
-"NACEX: Marcar si la dirección del alamcén es distinta a la establecida "
-"en el registro de Nacex como dirección de recogida."
+"NACEX: Marcar si la dirección del alamcén es distinta a la establecida en el"
+" registro de Nacex como dirección de recogida."
+
+msgctxt "help:stock.shipment.out.return,nacex_set_pickup_address:"
+msgid ""
+"NACEX: Set to true, if the warehouse address is different from the one "
+"setted in Nacex register as pickup."
+msgstr ""
+"NACEX: Marcar si la dirección del alamcén es distinta a la establecida en el"
+" registro de Nacex como dirección de recogida."
 
 msgctxt "model:ir.message,text:msg_missing_warehouse_address"
 msgid "Missing warehouse address"
@@ -118,37 +154,57 @@ msgctxt "selection:carrier.api,nacex_envase:"
 msgid "Pag"
 msgstr "Pag"
 
-msgctxt "selection:carrier.api,nacex_print:"
-msgid "IMAGEN"
-msgstr "IMAGEN"
+msgctxt "selection:carrier.api,nacex_tip_ea:"
+msgid "Ealerta informed by EMAIL"
+msgstr "Ealerta email"
 
-msgctxt "selection:carrier.api,nacex_print:"
-msgid "TECFV4"
-msgstr "TECFV4"
+msgctxt "selection:carrier.api,nacex_tip_ea:"
+msgid "Ealerta informed by SMS"
+msgstr "Ealerta SMS"
 
-msgctxt "selection:carrier.api,nacex_print:"
-msgid "TECSV4"
-msgstr "TECSV4"
+msgctxt "selection:carrier.api,nacex_tip_ea:"
+msgid "Without ealerta"
+msgstr "Sin ealerta"
 
-msgctxt "selection:carrier.api,nacex_print:"
-msgid "ZEBRA"
-msgstr "ZEBRA"
+msgctxt "selection:carrier.api,print_report:"
+msgid "Nacex IMAGEN"
+msgstr ""
+
+msgctxt "selection:carrier.api,print_report:"
+msgid "Nacex TECFV4"
+msgstr ""
+
+msgctxt "selection:carrier.api,print_report:"
+msgid "Nacex TECSV4"
+msgstr ""
+
+msgctxt "selection:carrier.api,print_report:"
+msgid "Nacex ZEBRA"
+msgstr ""
 
 msgctxt "selection:stock.shipment.out,nacex_frec_codigo:"
-msgid "Interdia or Puente Urbano: morning"
-msgstr "Interdia or Puente Urbano: mañana"
+msgid "Interdia aerial"
+msgstr "Interdia aerial"
 
 msgctxt "selection:stock.shipment.out,nacex_frec_codigo:"
 msgid "Interdia or Puente Urbano: late"
 msgstr "Interdia or Puente Urbano: tarde"
 
 msgctxt "selection:stock.shipment.out,nacex_frec_codigo:"
+msgid "Interdia or Puente Urbano: morning"
+msgstr "Interdia or Puente Urbano: mañana"
+
+msgctxt "selection:stock.shipment.out,nacex_frec_codigo:"
 msgid "Puente urbano night"
 msgstr "Puente urbano noche"
 
-msgctxt "selection:stock.shipment.out,nacex_frec_codigo:"
-msgid "Interdia aerial"
-msgstr "Interdia aerial"
+msgctxt "selection:stock.shipment.out,nacex_ret:"
+msgid "N"
+msgstr ""
+
+msgctxt "selection:stock.shipment.out,nacex_ret:"
+msgid "S"
+msgstr ""
 
 msgctxt "selection:stock.shipment.out,nacex_tip_ea:"
 msgid "Ealerta informed by EMAIL"
@@ -161,6 +217,30 @@ msgstr "Ealerta SMS"
 msgctxt "selection:stock.shipment.out,nacex_tip_ea:"
 msgid "Without ealerta"
 msgstr "Sin ealerta"
+
+msgctxt "selection:stock.shipment.out.return,nacex_frec_codigo:"
+msgid "Interdia aerial"
+msgstr "Interdia aerial"
+
+msgctxt "selection:stock.shipment.out.return,nacex_frec_codigo:"
+msgid "Interdia or Puente Urbano: late"
+msgstr "Interdia or Puente Urbano: tarde"
+
+msgctxt "selection:stock.shipment.out.return,nacex_frec_codigo:"
+msgid "Interdia or Puente Urbano: morning"
+msgstr "Interdia or Puente Urbano: mañana"
+
+msgctxt "selection:stock.shipment.out.return,nacex_frec_codigo:"
+msgid "Puente urbano night"
+msgstr "Puente urbano noche"
+
+msgctxt "selection:stock.shipment.out.return,nacex_ret:"
+msgid "N"
+msgstr ""
+
+msgctxt "selection:stock.shipment.out.return,nacex_ret:"
+msgid "S"
+msgstr ""
 
 msgctxt "view:carrier.api:"
 msgid "Nacex"

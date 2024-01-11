@@ -16,11 +16,11 @@ class CarrierApi(metaclass=PoolMeta):
     nacex_delegacion = fields.Char('Delegacion',
         states={
             'required': Eval('method') == 'nacex',
-        }, depends=['method'])
+        })
     nacex_abonado = fields.Char('Abonado',
         states={
             'required': Eval('method') == 'nacex',
-        }, depends=['method'])
+        })
     nacex_hora_ini1 = fields.Char('hora_ini1')
     nacex_hora_fin1 = fields.Char('hora_fin1')
     nacex_hora_ini2 = fields.Char('hora_ini2')

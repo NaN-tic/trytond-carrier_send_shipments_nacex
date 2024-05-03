@@ -119,7 +119,8 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
         else:
             self.nacex_ealerta = None
 
-    @fields.depends('carrier', 'customer')
+    @fields.depends('carrier', 'customer', 'delivery_address',
+        'nacex_ref_cli')
     def on_change_carrier(self):
         pool = Pool()
         API = pool.get('carrier.api')
@@ -136,7 +137,17 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
             if apis:
                 api, = apis
                 self.nacex_tip_ea = api.nacex_tip_ea
-            if self.customer:
+                self.nacex_envase = api.nacex_envase
+                self.carrier_service = api.default_service
+                if not self.nacex_ref_cli:
+                    self.nacex_ref_cli = self.number
+            if (self.delivery_address
+                    and hasattr(self.delivery_address, 'email')):
+                if api.nacex_tip_ea == 'S':
+                    self.nacex_ealerta = self.delivery_address.mobile
+                elif api.nacex_tip_ea == 'E':
+                    self.nacex_ealerta = self.delivery_address.email
+            elif self.customer:
                 if api.nacex_tip_ea == 'S':
                     self.nacex_ealerta = self.customer.mobile
                 elif api.nacex_tip_ea == 'E':

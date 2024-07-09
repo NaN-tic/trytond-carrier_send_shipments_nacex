@@ -462,8 +462,8 @@ class ShipmentOutReturn(NacexMixin, metaclass=PoolMeta):
                 waddress.country.code or '')
             data['tel_ent'] = unspaces(api.phone or
                 shipment.company.party.phone or '')[:20]
-            if shipment.carrier_notes:
-                data['obs1'] = unaccent(shipment.carrier_notes)[:38].rstrip()
+            if shipment.carrier_note:
+                data['obs1'] = unaccent(shipment.carrier_note)[:38].rstrip()
 
             data['modelo'] = api.print_report
 

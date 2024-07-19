@@ -9,7 +9,8 @@ from trytond.model import ModelSQL, ModelView, fields
 from trytond.transaction import Transaction
 from trytond.i18n import gettext
 from trytond.exceptions import UserError
-from trytond.modules.carrier_send_shipments.tools import unaccent, unspaces
+from trytond.modules.carrier_send_shipments.tools import (unaccent, unspaces,
+    split_into_blocks)
 from .utils import nacex_call
 
 __all__ = ['ShipmentOut']
@@ -281,7 +282,10 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
             data['tel_ent'] = unspaces(shipment.customer.mobile or
                 shipment.customer.phone or '')[:15]
             if shipment.carrier_note:
-                data['obs1'] = unaccent(shipment.carrier_note)[:38].rstrip()
+                blocks = split_into_blocks(unaccent(shipment.carrier_note).rstrip(), max_length=38)
+                # obs1, obs2, obs3, obs4
+                for i, block in enumerate(blocks[:4]):
+                    data['obs'+str(i+1)] = block
 
             resp = nacex_call(api, 'putExpedicion', data)
             values = resp.text.split('|')

@@ -238,7 +238,7 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
             #   'T': Tercera: Factura una tercera agencia
             data['tip_cob'] = 'O'
             data['ref_cli'] = (shipment.nacex_ref_cli
-                                and shipment.nacex_ref_cli[:20] or code[:20])
+                and shipment.nacex_ref_cli[:20] or code[:20])
             data['tip_env'] = shipment.nacex_envase or api.nacex_envase or '2'
             data['bul'] = str(packages)[:3].zfill(3)
             data['kil'] = str(weight)
@@ -284,8 +284,8 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                 shipment.customer.phone or '')[:15]
             if shipment.carrier_note:
                 blocks = split_into_blocks(
-                            unaccent(shipment.carrier_note).rstrip(),
-                            max_length=38)
+                    unaccent(shipment.carrier_note).rstrip(),
+                    max_length=38)
                 # obs1, obs2, obs3, obs4
                 for i, block in enumerate(blocks[:4]):
                     data['obs'+str(i+1)] = block
@@ -367,7 +367,7 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
 
             api_label = resp.text
             temp_name = cls.nacex_label_file(
-                            api, dbname, agencia, numero, api_label)
+                api, dbname, agencia, numero, api_label)
             if not temp_name:
                 continue
             labels.append(temp_name)

@@ -271,7 +271,8 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                     shipment.company.party.phone or '')[:35]
             data['nom_ent'] = unaccent((shipment.delivery_address.party_name
                     or shipment.customer.name))[:35]
-            data['per_ent'] = unaccent((shipment.delivery_address.party_name
+            data['per_ent'] = unaccent((shipment.delivery_address.name
+                    or shipment.delivery_address.party_name
                     or shipment.customer.name))[:35]
             data['dir_ent'] = unaccent(
                 shipment.delivery_address.street.replace('\n', ' - ')

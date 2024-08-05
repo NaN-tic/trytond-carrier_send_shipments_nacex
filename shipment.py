@@ -269,7 +269,8 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                     waddress.country.code or '')
                 data['tel_rec'] = unspaces(api.phone or
                     shipment.company.party.phone or '')[:35]
-            data['nom_ent'] = unaccent(shipment.customer.name)[:35]
+            data['nom_ent'] = unaccent((shipment.delivery_address.party_name
+                    or shipment.customer.name))[:35]
             data['per_ent'] = unaccent((shipment.delivery_address.party_name
                     or shipment.customer.name))[:35]
             data['dir_ent'] = unaccent(

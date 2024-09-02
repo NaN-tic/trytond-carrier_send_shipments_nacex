@@ -1,7 +1,8 @@
 #This file is part of nacex. The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
-import requests
 import hashlib
+import requests
+import time
 
 
 def nacex_call(api, method, data):
@@ -14,7 +15,16 @@ def nacex_call(api, method, data):
         method, api.username,
         hashlib.md5(password).hexdigest(),
         nacex_data(data))
-    return requests.get(url)
+
+    for x in range(5):
+        try:
+            res = requests.get(url)
+        except requests.exceptions.RequestException as e:
+            if x >= 5:
+                raise e
+            time.sleep(1 * x)
+            continue
+    return res
 
 
 def nacex_data(data):

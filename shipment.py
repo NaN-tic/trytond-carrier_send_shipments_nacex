@@ -317,7 +317,9 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
 
             if reference:
                 cls.write([shipment], {
-                    'carrier_tracking_ref': reference,
+                    'carrier_tracking_ref': (
+                        shipment.carrier_tracking_ref+', '+reference
+                        if shipment.carrier_tracking_ref else reference),
                     'carrier_service': service,
                     'carrier_delivery': True,
                     'carrier_send_date': ShipmentOut.get_carrier_date(),

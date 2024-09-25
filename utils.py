@@ -3,6 +3,9 @@
 import hashlib
 import requests
 import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def nacex_call(api, method, data):
@@ -20,6 +23,7 @@ def nacex_call(api, method, data):
         try:
             res = requests.get(url)
         except requests.exceptions.RequestException as e:
+            logger.error(str(e))
             if x >= 5:
                 raise e
             time.sleep(1 * x)

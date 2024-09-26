@@ -121,7 +121,7 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
             self.nacex_ealerta = None
 
     @fields.depends('carrier', 'customer', 'delivery_address',
-        'nacex_ref_cli')
+        'nacex_ref_cli', 'number')
     def on_change_carrier(self):
         pool = Pool()
         API = pool.get('carrier.api')

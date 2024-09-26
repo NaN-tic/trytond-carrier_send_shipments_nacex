@@ -298,7 +298,6 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
             if len(values) == 1 or resp.status_code != 200:
                 message = gettext(
                     'carrier_send_shipments_nacex.msg_nacex_connection_error',
-                    name=shipment.rec_name,
                     error=resp.text)
                 errors.append(message)
                 continue
@@ -306,7 +305,6 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
             if values[0] == 'ERROR':
                 message = gettext(
                     'carrier_send_shipments_nacex.msg_nacex_not_send_error',
-                    name=shipment.rec_name,
                     error=resp.text)
                 errors.append(message)
                 continue

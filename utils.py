@@ -2,8 +2,9 @@
 #this repository contains the full copyright notices and license terms.
 import hashlib
 import requests
-import time
 import logging
+from trytond.i18n import gettext
+from trytond.exceptions import UserError
 
 logger = logging.getLogger(__name__)
 
@@ -19,15 +20,13 @@ def nacex_call(api, method, data):
         hashlib.md5(password).hexdigest(),
         nacex_data(data))
 
-    for x in range(5):
-        try:
-            res = requests.get(url)
-        except requests.exceptions.RequestException as e:
-            logger.error(str(e))
-            if x >= 5:
-                raise e
-            time.sleep(1 * x)
-            continue
+    try:
+        res = requests.get(url)
+    except requests.exceptions.RequestException as e:
+        logger.error(str(e))
+        raise UserError(gettext(
+            'carrier_send_shipments_nacex.msg_nacex_connection_error',
+            error=str(e)))
     return res
 
 

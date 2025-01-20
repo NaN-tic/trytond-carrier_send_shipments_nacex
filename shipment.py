@@ -305,7 +305,7 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
             if values[0] == 'ERROR':
                 message = gettext(
                     'carrier_send_shipments_nacex.msg_nacex_not_send_error',
-                    error=resp.text)
+                    name=shipment.rec_name, error=resp.text)
                 errors.append(message)
                 continue
 

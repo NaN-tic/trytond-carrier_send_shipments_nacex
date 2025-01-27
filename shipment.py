@@ -242,7 +242,7 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
             data['tip_env'] = shipment.nacex_envase or api.nacex_envase or '2'
             data['bul'] = str(packages)[:3].zfill(3)
             data['kil'] = str(weight)
-            data['nacex_ret'] = shipment.nacex_ret or 'N'
+            data['ret'] = shipment.nacex_ret or 'N'
 
             # 1	Interdia or Puente Urbano: frequency 1 (morning)
             # 2	Interdia or Puente Urbano: frequency 2 (late)

@@ -228,7 +228,6 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                 waddress = waddresses[0]
 
             data = {}
-            data['ref'] = shipment.reference
             data['del_cli'] = api.nacex_delegacion[:4]
             data['num_cli'] = api.nacex_abonado[:5]
             data['fec'] = Date.today().strftime("%d/%m/%Y")
@@ -295,7 +294,7 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
 
             resp = nacex_call(api, 'putExpedicion', data)
             values = resp.text.split('|')
-
+            exp_code = values[0]
             if len(values) == 1 or resp.status_code != 200:
                 message = gettext(
                     'carrier_send_shipments_nacex.msg_nacex_connection_error',
@@ -305,7 +304,7 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
 
             if values[0] == 'ERROR':
                 if values[2] == '5626':
-                    data['ref'] = shipment.reference
+                    data['expe_codigo'] = exp_code
                     resp = nacex_call(api, 'editExpedicion', data)
                     if len(values) == 1 or resp.status_code != 200:
                         message = gettext(

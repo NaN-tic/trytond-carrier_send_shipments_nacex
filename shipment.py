@@ -302,12 +302,25 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                 errors.append(message)
                 continue
 
+            redone_label = None
             if values[0] == 'ERROR':
-                message = gettext(
-                    'carrier_send_shipments_nacex.msg_nacex_not_send_error',
-                    name=shipment.rec_name, error=resp.text)
-                errors.append(message)
-                continue
+                if values[2] == '5016':
+                    resp = nacex_call(api, 'editExpedicion', data)
+                    if len(values) == 1 or resp.status_code != 200:
+                        message = gettext(
+                            'carrier_send_shipments_nacex.msg_nacex_connection_error',
+                            name=shipment.rec_name,
+                            error=resp.text)
+                        errors.append(message)
+                        continue
+                    values = resp.text.split('|', 1)
+                else:
+                    message = gettext(
+                        'carrier_send_shipments_nacex.msg_nacex_not_send_error',
+                        name=shipment.rec_name,
+                        error=resp.text)
+                    errors.append(message)
+                    continue
 
             # response example:
             # resp = codExp|agencia/numero expedicion|color|ruta|codigo agencia|nombre agencia|telf entrega|service|hora entrega|barcode|fecha prevista
@@ -489,13 +502,6 @@ class ShipmentOutReturn(NacexMixin, metaclass=PoolMeta):
                 errors.append(message)
                 continue
 
-            if values[0] == 'ERROR':
-                message = gettext(
-                    'carrier_send_shipments_nacex.msg_nacex_not_send_error',
-                    name=shipment.rec_name,
-                    error=resp.text)
-                errors.append(message)
-                continue
 
             reference = values[0]
             api_label = values[1]

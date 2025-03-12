@@ -228,6 +228,7 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                 waddress = waddresses[0]
 
             data = {}
+            data['ref'] = shipment.reference
             data['del_cli'] = api.nacex_delegacion[:4]
             data['num_cli'] = api.nacex_abonado[:5]
             data['fec'] = Date.today().strftime("%d/%m/%Y")

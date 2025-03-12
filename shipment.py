@@ -302,9 +302,10 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                 errors.append(message)
                 continue
 
-            redone_label = None
             if values[0] == 'ERROR':
-                if values[2] == '5016':
+                if values[2] == '5626':
+                    data['expe_codigo'] = (shipment.nacex_ref_cli
+                and shipment.nacex_ref_cli[:20] or code[:20])
                     resp = nacex_call(api, 'editExpedicion', data)
                     if len(values) == 1 or resp.status_code != 200:
                         message = gettext(

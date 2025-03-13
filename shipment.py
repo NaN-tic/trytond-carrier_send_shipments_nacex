@@ -294,17 +294,15 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
 
             resp = nacex_call(api, 'putExpedicion', data)
             values = resp.text.split('|')
-            exp_code = values[0]
             if len(values) == 1 or resp.status_code != 200:
                 message = gettext(
                     'carrier_send_shipments_nacex.msg_nacex_connection_error',
                     error=resp.text)
                 errors.append(message)
                 continue
-
             if values[0] == 'ERROR':
                 if values[2] == '5626':
-                    data['expe_codigo'] = exp_code
+                    data['ref'] = shipment.number
                     resp = nacex_call(api, 'editExpedicion', data)
                     if len(values) == 1 or resp.status_code != 200:
                         message = gettext(
@@ -327,7 +325,6 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
             # resp = '9999999|2841/9999999|GRIS|2V|0832|VILAFRANCA|938902108|NACEX 19:00H|Entregar antes de las 19:00H.|00128419999999083208|07/05/2021|'
 
             reference = values[1]
-
             if reference:
                 cls.write([shipment], {
                     'carrier_tracking_ref': (
@@ -338,6 +335,7 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                     'carrier_send_date': ShipmentOut.get_carrier_date(),
                     'carrier_send_employee': (
                         ShipmentOut.get_carrier_employee() or None),
+                    'nacex_exp_ref': values[0]
                     })
                 logger.info('Send shipment %s' % (shipment.number))
                 references.append(shipment.number)

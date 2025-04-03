@@ -13,4 +13,5 @@ def register():
         module='carrier_send_shipments_nacex', type_='model')
     Pool.register(
         manifest.CarrierManifest,
+        shipment.CarrierSendShipments,
         module='carrier_send_shipments_nacex', type_='wizard')

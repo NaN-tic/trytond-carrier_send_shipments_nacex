@@ -105,19 +105,6 @@ class NacexMixin(ModelSQL, ModelView):
         temp.close()
         return temp.name
 
-class CarrierSendShipments(metaclass=PoolMeta):
-    __name__ = "carrier.send.shipments"
-
-    def validate_shipment(self, shipments):
-        try:
-            super().validate_shipment(shipments)
-        except UserError:
-            for shipment in shipments:
-                shipment.check_shipment_state()
-                shipment.check_shipment_carrier()
-                shipment.check_api()
-                shipment.check_zip()
-
 
 class ShipmentOut(NacexMixin, metaclass=PoolMeta):
     __name__ = 'stock.shipment.out'
@@ -173,6 +160,12 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                     self.nacex_ealerta = self.customer.mobile
                 elif api.nacex_tip_ea == 'E':
                     self.nacex_ealerta = self.customer.email
+
+    def check_duplicate_package(self):
+        if self.carrier_service and self.carrier_service.api.method == 'nacex':
+            return
+        else:
+            super().check_duplicate_package
 
     @classmethod
     def send_nacex(cls, api, shipments):

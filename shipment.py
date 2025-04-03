@@ -304,13 +304,6 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                 if values[2] == '5626':
                     data['ref'] = shipment.number
                     resp = nacex_call(api, 'editExpedicion', data)
-                    if len(values) == 1 or resp.status_code != 200:
-                        message = gettext(
-                            'carrier_send_shipments_nacex.msg_nacex_connection_error',
-                            name=shipment.rec_name,
-                            error=resp.text)
-                        errors.append(message)
-                        continue
                     values = resp.text.split('|', 1)
                 else:
                     message = gettext(

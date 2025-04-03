@@ -336,6 +336,7 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                 logger.error('Not send shipment %s.' % (shipment.number))
 
             labels += cls.print_labels_nacex(api, [shipment])
+            resp = nacex_call(api, 'cancelExpedicion', {'ref': shipment.number})
         if labels:
             cls.write(shipments, {'carrier_printed': True})
 

@@ -328,7 +328,6 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                     'carrier_send_date': ShipmentOut.get_carrier_date(),
                     'carrier_send_employee': (
                         ShipmentOut.get_carrier_employee() or None),
-                    'nacex_exp_ref': values[0]
                     })
                 logger.info('Send shipment %s' % (shipment.number))
                 references.append(shipment.number)
@@ -336,10 +335,8 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                 logger.error('Not send shipment %s.' % (shipment.number))
 
             labels += cls.print_labels_nacex(api, [shipment])
-            resp = nacex_call(api, 'cancelExpedicion', {'ref': shipment.number})
         if labels:
             cls.write(shipments, {'carrier_printed': True})
-
         return references, labels, errors
 
     @classmethod

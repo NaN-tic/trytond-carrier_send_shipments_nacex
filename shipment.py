@@ -105,6 +105,7 @@ class NacexMixin(ModelSQL, ModelView):
         temp.close()
         return temp.name
 
+
 class ShipmentOut(NacexMixin, metaclass=PoolMeta):
     __name__ = 'stock.shipment.out'
 
@@ -159,6 +160,12 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                     self.nacex_ealerta = self.customer.mobile
                 elif api.nacex_tip_ea == 'E':
                     self.nacex_ealerta = self.customer.email
+
+    def check_duplicate_package(self):
+        if self.carrier_service and self.carrier_service.api.method == 'nacex':
+            return
+        else:
+            super().check_duplicate_package
 
     @classmethod
     def send_nacex(cls, api, shipments):
@@ -292,27 +299,30 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
 
             resp = nacex_call(api, 'putExpedicion', data)
             values = resp.text.split('|')
-
             if len(values) == 1 or resp.status_code != 200:
                 message = gettext(
                     'carrier_send_shipments_nacex.msg_nacex_connection_error',
                     error=resp.text)
                 errors.append(message)
                 continue
-
             if values[0] == 'ERROR':
-                message = gettext(
-                    'carrier_send_shipments_nacex.msg_nacex_not_send_error',
-                    name=shipment.rec_name, error=resp.text)
-                errors.append(message)
-                continue
+                if values[2] == '5626':
+                    data['ref'] = shipment.number
+                    resp = nacex_call(api, 'editExpedicion', data)
+                    values = resp.text.split('|', 1)
+                else:
+                    message = gettext(
+                        'carrier_send_shipments_nacex.msg_nacex_not_send_error',
+                        name=shipment.rec_name,
+                        error=resp.text)
+                    errors.append(message)
+                    continue
 
             # response example:
             # resp = codExp|agencia/numero expedicion|color|ruta|codigo agencia|nombre agencia|telf entrega|service|hora entrega|barcode|fecha prevista
             # resp = '9999999|2841/9999999|GRIS|2V|0832|VILAFRANCA|938902108|NACEX 19:00H|Entregar antes de las 19:00H.|00128419999999083208|07/05/2021|'
 
             reference = values[1]
-
             if reference:
                 cls.write([shipment], {
                     'carrier_tracking_ref': (
@@ -332,7 +342,6 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
             labels += cls.print_labels_nacex(api, [shipment])
         if labels:
             cls.write(shipments, {'carrier_printed': True})
-
         return references, labels, errors
 
     @classmethod
@@ -487,13 +496,6 @@ class ShipmentOutReturn(NacexMixin, metaclass=PoolMeta):
                 errors.append(message)
                 continue
 
-            if values[0] == 'ERROR':
-                message = gettext(
-                    'carrier_send_shipments_nacex.msg_nacex_not_send_error',
-                    name=shipment.rec_name,
-                    error=resp.text)
-                errors.append(message)
-                continue
 
             reference = values[0]
             api_label = values[1]

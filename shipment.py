@@ -4,6 +4,7 @@
 import logging
 import tempfile
 import base64
+from datetime import timedelta
 from trytond.pool import Pool, PoolMeta
 from trytond.model import ModelSQL, ModelView, fields
 from trytond.transaction import Transaction
@@ -181,12 +182,13 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
         Uom = pool.get('product.uom')
         Date = pool.get('ir.date')
 
+        today = Date.today()
+
         references = []
         labels = []
         errors = []
 
         default_service = CarrierApi.get_default_carrier_service(api)
-
         for shipment in shipments:
             service = (shipment.carrier_service or shipment.carrier.service or
                 default_service)
@@ -237,7 +239,7 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
             data = {}
             data['del_cli'] = api.nacex_delegacion[:4]
             data['num_cli'] = api.nacex_abonado[:5]
-            data['fec'] = Date.today().strftime("%d/%m/%Y")
+            data['fec'] = today.strftime("%d/%m/%Y")
             data['tip_ser'] = service.code
             # TODO: Tipo de cobro
             #   'O', Origen: Factura la agencia origen del envío
@@ -297,32 +299,98 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                 for i, block in enumerate(blocks[:4]):
                     data['obs'+str(i+1)] = block
 
-            resp = nacex_call(api, 'putExpedicion', data)
-            values = resp.text.split('|')
-            if len(values) == 1 or resp.status_code != 200:
-                message = gettext(
-                    'carrier_send_shipments_nacex.msg_nacex_connection_error',
-                    error=resp.text)
-                errors.append(message)
-                continue
-            if values[0] == 'ERROR':
-                if values[2] == '5626':
-                    data['ref'] = shipment.number
-                    resp = nacex_call(api, 'editExpedicion', data)
-                    values = resp.text.split('|', 1)
-                else:
+            reference = None
+
+            # if/else: editExpedicion or putExpedicion
+            if shipment.nacex_ref_cli:
+                data['ref'] = shipment.nacex_ref_cli[:20]
+                resp = nacex_call(api, 'editExpedicion', data)
+                values = resp.text.split('|', 1)
+                if len(values) == 1 or resp.status_code != 200:
+                    message = gettext(
+                        'carrier_send_shipments_nacex.msg_nacex_connection_error',
+                        error=resp.text)
+                    errors.append(message)
+                    continue
+                elif values[0] == 'ERROR':
                     message = gettext(
                         'carrier_send_shipments_nacex.msg_nacex_not_send_error',
                         name=shipment.rec_name,
                         error=resp.text)
                     errors.append(message)
                     continue
+                else:
+                    errors.append(values[1])
+            else:
+                resp = nacex_call(api, 'putExpedicion', data)
+                values = resp.text.split('|')
+                if len(values) == 1 or resp.status_code != 200:
+                    message = gettext(
+                        'carrier_send_shipments_nacex.msg_nacex_connection_error',
+                        error=resp.text)
+                    errors.append(message)
+                    continue
+                elif values[0] == 'ERROR':
+                    # In case return 5626, the shipment is registered at Nacex but we don't have the "nacex_ref_cli",
+                    # search the shipment getListadoExpediciones and get "agencia/expedicion"
+                    # 5626: Referencia duplicada. Este abonado esta configurado para no admitir referencias duplicadas en el mismo dia
+                    if values[2] == '5626':
+                        data_list = {
+                            'fecha_ini':(today - timedelta(days=1)).strftime("%d/%m/%Y"),
+                            'fecha_fin': today.strftime("%d/%m/%Y"),
+                            'campos': 'referencia;codigo_cliente'}
+                        resp = nacex_call(api, 'getListadoExpediciones', data_list)
+                        if resp.status_code != 200:
+                            message = gettext(
+                                'carrier_send_shipments_nacex.msg_nacex_connection_error',
+                                error=resp.text)
+                            errors.append(message)
+                            continue
+                        for nacex_listado in resp.text.split('|'):
+                            if shipment.number in nacex_listado:
+                                vals = nacex_listado.split('~')
+                                reference = '%s/%s' % (vals[0], vals[1])
+                                break
+                        if reference:
+                            data['origen'] = api.nacex_delegacion[:4]
+                            data['albaran'] = reference.split('/')[1]
+                            resp = nacex_call(api, 'editExpedicion', data)
+                            if resp.status_code != 200:
+                                message = gettext(
+                                    'carrier_send_shipments_nacex.msg_nacex_connection_error',
+                                    error=resp.text)
+                                errors.append(message)
+                                continue
+                            values = resp.text.split('|', 1)
+                            if values[0] == 'ERROR':
+                                message = gettext(
+                                    'carrier_send_shipments_nacex.msg_nacex_not_send_error',
+                                    name=shipment.rec_name,
+                                    error=resp.text)
+                                errors.append(message)
+                                continue
+                        else:
+                            message = gettext(
+                                'carrier_send_shipments_nacex.msg_nacex_not_send_error',
+                                name=shipment.rec_name,
+                                error='Not found reference')
+                            errors.append(message)
+                            continue
+                    # other putExpedicion errors
+                    else:
+                        message = gettext(
+                            'carrier_send_shipments_nacex.msg_nacex_not_send_error',
+                            name=shipment.rec_name,
+                            error=resp.text)
+                        errors.append(message)
+                        continue
+                else:
+                    reference = values[1]
 
             # response example:
             # resp = codExp|agencia/numero expedicion|color|ruta|codigo agencia|nombre agencia|telf entrega|service|hora entrega|barcode|fecha prevista
             # resp = '9999999|2841/9999999|GRIS|2V|0832|VILAFRANCA|938902108|NACEX 19:00H|Entregar antes de las 19:00H.|00128419999999083208|07/05/2021|'
 
-            reference = values[1]
             if reference:
                 cls.write([shipment], {
                     'carrier_tracking_ref': (
@@ -495,7 +563,6 @@ class ShipmentOutReturn(NacexMixin, metaclass=PoolMeta):
                     error=resp.text)
                 errors.append(message)
                 continue
-
 
             reference = values[0]
             api_label = values[1]

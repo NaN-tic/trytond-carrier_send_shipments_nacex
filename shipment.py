@@ -417,12 +417,29 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
         '''
         Get labels from shipments out from Nacex
         '''
+        pool = Pool()
+        Date = pool.get('ir.date')
+
+        today = Date.today()
         labels = []
         dbname = Transaction().database.name
 
         to_write = []
         for shipment in shipments:
             reference = shipment.carrier_tracking_ref
+            if not reference:
+                data_list = {
+                    'fecha_ini':(today - timedelta(days=1)).strftime("%d/%m/%Y"),
+                    'fecha_fin': today.strftime("%d/%m/%Y"),
+                    'campos': 'referencia;codigo_cliente'}
+                resp = nacex_call(api, 'getListadoExpediciones', data_list)
+                if resp.status_code != 200:
+                    continue
+                for nacex_listado in resp.text.split('|'):
+                    if shipment.number in nacex_listado:
+                        vals = nacex_listado.split('~')
+                        reference = '%s/%s' % (vals[0], vals[1])
+                        break
             if not reference:
                 continue
 
@@ -449,11 +466,14 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                 continue
             labels.append(temp_name)
 
-            to_write.extend(([shipment], {
+            values = {
                 'carrier_printed': True,
                 'carrier_tracking_label': fields.Binary.cast(
                     open(temp_name, "rb").read()),
-                }))
+                }
+            if not shipment.carrier_tracking_ref:
+                values['carrier_tracking_ref'] = reference
+            to_write.extend(([shipment], values))
         if to_write:
             cls.write(*to_write)
         return labels

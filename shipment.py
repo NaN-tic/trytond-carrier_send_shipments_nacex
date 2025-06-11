@@ -302,8 +302,11 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
             reference = None
 
             # if/else: editExpedicion or putExpedicion
-            if shipment.nacex_ref_cli:
-                data['ref'] = shipment.nacex_ref_cli[:20]
+            if shipment.carrier_tracking_ref:
+                reference = shipment.carrier_tracking_ref.split(', ')[0]
+                # data['ref'] = shipment.nacex_ref_cli[:20]
+                data['origen'] = api.nacex_delegacion[:4]
+                data['albaran'] = reference.split('/')[1]
                 resp = nacex_call(api, 'editExpedicion', data)
                 values = resp.text.split('|', 1)
                 if len(values) == 1 or resp.status_code != 200:
@@ -426,7 +429,7 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
 
         to_write = []
         for shipment in shipments:
-            reference = shipment.carrier_tracking_ref
+            reference = shipment.carrier_tracking_ref and shipment.carrier_tracking_ref.split(', ')[0]
             if not reference:
                 data_list = {
                     'fecha_ini':(today - timedelta(days=1)).strftime("%d/%m/%Y"),
@@ -436,7 +439,8 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                 if resp.status_code != 200:
                     continue
                 for nacex_listado in resp.text.split('|'):
-                    if shipment.number in nacex_listado:
+                    nacex_ref_cli = shipment.nacex_ref_cli or shipment.number
+                    if nacex_ref_cli in nacex_listado:
                         vals = nacex_listado.split('~')
                         reference = '%s/%s' % (vals[0], vals[1])
                         break

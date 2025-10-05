@@ -137,13 +137,14 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
             apis = API.search([
                     ('carriers', 'in', [self.carrier.id])
                     ], limit=1)
-            if apis:
-                api, = apis
-                self.nacex_tip_ea = api.nacex_tip_ea
-                self.nacex_envase = api.nacex_envase
-                self.carrier_service = api.default_service
-                if not self.nacex_ref_cli:
-                    self.nacex_ref_cli = self.number
+            if not apis:
+                return
+            api, = apis
+            self.nacex_tip_ea = api.nacex_tip_ea
+            self.nacex_envase = api.nacex_envase
+            self.carrier_service = api.default_service
+            if not self.nacex_ref_cli:
+                self.nacex_ref_cli = self.number
             if self.delivery_address:
                 type_ = None
                 value = None

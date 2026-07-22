@@ -14,8 +14,6 @@ from trytond.modules.carrier_send_shipments.tools import (unaccent, unspaces,
     split_into_blocks)
 from .utils import nacex_call
 
-__all__ = ['ShipmentOut']
-
 logger = logging.getLogger(__name__)
 
 
@@ -75,13 +73,23 @@ class NacexMixin(ModelSQL, ModelView):
     def default_nacex_ret():
         return 'N'
 
-    @fields.depends('nacex_tip_ea', 'customer')
+    @classmethod
+    def nacex_contact_mechanism(cls, address, types, default=''):
+        if not address:
+            return default
+        mechanism = address.contact_mechanism_get(types)
+        return mechanism.value if mechanism else default
+
+    @fields.depends('delivery_address', 'nacex_tip_ea')
     def on_change_nacex_tip_ea(self):
-        if self.customer:
-            if self.nacex_tip_ea == 'S':
-                self.nacex_ealerta = self.customer.mobile
-            if self.nacex_tip_ea == 'E':
-                self.nacex_ealerta = self.customer.email
+        if self.nacex_tip_ea == 'S':
+            self.nacex_ealerta = self.nacex_contact_mechanism(
+                self.delivery_address, {'mobile', 'phone'})
+        elif self.nacex_tip_ea == 'E':
+            self.nacex_ealerta = self.nacex_contact_mechanism(
+                self.delivery_address, 'email')
+        else:
+            self.nacex_ealerta = None
 
     @classmethod
     def nacex_label_file(cls, api, dbname, agencia, numero, api_label):
@@ -110,15 +118,19 @@ class NacexMixin(ModelSQL, ModelView):
 class ShipmentOut(NacexMixin, metaclass=PoolMeta):
     __name__ = 'stock.shipment.out'
 
-    @fields.depends('customer', 'nacex_tip_ea')
+    @fields.depends('customer', 'delivery_address', 'nacex_tip_ea')
     def on_change_customer(self):
         super().on_change_customer()
 
         if self.customer:
             if self.nacex_tip_ea == 'S':
-                self.nacex_ealerta = self.customer.mobile
+                self.nacex_ealerta = self.nacex_contact_mechanism(
+                    self.delivery_address, {'mobile', 'phone'})
             elif self.nacex_tip_ea == 'E':
-                self.nacex_ealerta = self.customer.email
+                self.nacex_ealerta = self.nacex_contact_mechanism(
+                    self.delivery_address, 'email')
+            else:
+                self.nacex_ealerta = None
         else:
             self.nacex_ealerta = None
 
@@ -145,22 +157,23 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                 if not self.nacex_ref_cli:
                     self.nacex_ref_cli = self.number
             if self.delivery_address:
-                type_ = None
-                value = None
                 if api.nacex_tip_ea == 'S':
-                    type_ = ('mobile', 'phone')
+                    self.nacex_ealerta = self.nacex_contact_mechanism(
+                        self.delivery_address, {'mobile', 'phone'})
                 elif api.nacex_tip_ea == 'E':
-                    type_ = ('email',)
-                for mechanism in self.delivery_address.contact_mechanisms:
-                    if mechanism.type in type_:
-                        value = mechanism.value
-                        break
-                self.nacex_ealerta = value
+                    self.nacex_ealerta = self.nacex_contact_mechanism(
+                        self.delivery_address, 'email')
+                else:
+                    self.nacex_ealerta = None
             elif self.customer:
                 if api.nacex_tip_ea == 'S':
-                    self.nacex_ealerta = self.customer.mobile
+                    self.nacex_ealerta = self.nacex_contact_mechanism(
+                        self.delivery_address, {'mobile', 'phone'})
                 elif api.nacex_tip_ea == 'E':
-                    self.nacex_ealerta = self.customer.email
+                    self.nacex_ealerta = self.nacex_contact_mechanism(
+                        self.delivery_address, 'email')
+                else:
+                    self.nacex_ealerta = None
 
     def check_duplicate_package(self):
         if self.carrier_service and self.carrier_service.api.method == 'nacex':
@@ -289,8 +302,8 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
             data['pob_ent'] = unaccent(shipment.delivery_address.city)[:40]
             data['pais_ent'] = unaccent(shipment.delivery_address.country
                 and shipment.delivery_address.country.code or '')
-            data['tel_ent'] = unspaces(shipment.customer.mobile or
-                shipment.customer.phone or '')[:15]
+            data['tel_ent'] = unspaces(cls.nacex_contact_mechanism(
+                shipment.delivery_address, {'mobile', 'phone'}))[:15]
             if shipment.carrier_note:
                 blocks = split_into_blocks(
                     unaccent(shipment.carrier_note).rstrip(),

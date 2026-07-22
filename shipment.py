@@ -80,17 +80,6 @@ class NacexMixin(ModelSQL, ModelView):
         mechanism = address.contact_mechanism_get(types)
         return mechanism.value if mechanism else default
 
-    @fields.depends('delivery_address', 'nacex_tip_ea')
-    def on_change_nacex_tip_ea(self):
-        if self.nacex_tip_ea == 'S':
-            self.nacex_ealerta = self.nacex_contact_mechanism(
-                self.delivery_address, {'mobile', 'phone'})
-        elif self.nacex_tip_ea == 'E':
-            self.nacex_ealerta = self.nacex_contact_mechanism(
-                self.delivery_address, 'email')
-        else:
-            self.nacex_ealerta = None
-
     @classmethod
     def nacex_label_file(cls, api, dbname, agencia, numero, api_label):
         if api.print_report == 'IMAGEN_B':
@@ -117,6 +106,17 @@ class NacexMixin(ModelSQL, ModelView):
 
 class ShipmentOut(NacexMixin, metaclass=PoolMeta):
     __name__ = 'stock.shipment.out'
+
+    @fields.depends('delivery_address', 'nacex_tip_ea')
+    def on_change_nacex_tip_ea(self):
+        if self.nacex_tip_ea == 'S':
+            self.nacex_ealerta = self.nacex_contact_mechanism(
+                self.delivery_address, {'mobile', 'phone'})
+        elif self.nacex_tip_ea == 'E':
+            self.nacex_ealerta = self.nacex_contact_mechanism(
+                self.delivery_address, 'email')
+        else:
+            self.nacex_ealerta = None
 
     @fields.depends('customer', 'delivery_address', 'nacex_tip_ea')
     def on_change_customer(self):

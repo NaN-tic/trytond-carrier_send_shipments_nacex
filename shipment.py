@@ -146,7 +146,7 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
         else:
             self.nacex_ealerta = None
 
-    @fields.depends('carrier', 'customer', 'delivery_address',
+    @fields.depends('carrier', 'delivery_address',
         'nacex_ref_cli', 'number')
     def on_change_carrier(self):
         pool = Pool()
@@ -168,6 +168,7 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                 self.carrier_service = api.default_service
                 if not self.nacex_ref_cli:
                     self.nacex_ref_cli = self.number
+
             if self.delivery_address:
                 if api.nacex_tip_ea == 'S':
                     self.nacex_ealerta = self.nacex_contact_mechanism(
@@ -177,15 +178,8 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                         self.delivery_address, 'email')
                 else:
                     self.nacex_ealerta = None
-            elif self.customer:
-                if api.nacex_tip_ea == 'S':
-                    self.nacex_ealerta = self.nacex_contact_mechanism(
-                        self.delivery_address, {'mobile', 'phone'})
-                elif api.nacex_tip_ea == 'E':
-                    self.nacex_ealerta = self.nacex_contact_mechanism(
-                        self.delivery_address, 'email')
-                else:
-                    self.nacex_ealerta = None
+            else:
+                self.nacex_ealerta = None
 
     def check_duplicate_package(self):
         if self.carrier_service and self.carrier_service.api.method == 'nacex':

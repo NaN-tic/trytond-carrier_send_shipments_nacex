@@ -133,7 +133,7 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
         else:
             self.nacex_ealerta = None
 
-    @fields.depends('customer', 'delivery_address', 'nacex_tip_ea',
+    @fields.depends('delivery_address', 'nacex_tip_ea',
         methods=['set_nacex_ealerta'])
     def on_change_delivery_address(self):
         try:

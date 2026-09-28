@@ -7,7 +7,7 @@ import base64
 from datetime import timedelta
 from trytond.pool import Pool, PoolMeta
 from trytond.model import ModelSQL, ModelView, fields
-from trytond.transaction import Transaction
+from trytond.transaction import Transaction, without_check_access
 from trytond.i18n import gettext
 from trytond.exceptions import UserError
 from trytond.modules.carrier_send_shipments.tools import (unaccent, unspaces,
@@ -414,16 +414,17 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
             # resp = '9999999|2841/9999999|GRIS|2V|0832|VILAFRANCA|938902108|NACEX 19:00H|Entregar antes de las 19:00H.|00128419999999083208|07/05/2021|'
 
             if reference:
-                cls.write([shipment], {
-                    'carrier_tracking_ref': (
-                        shipment.carrier_tracking_ref+', '+reference
-                        if shipment.carrier_tracking_ref else reference),
-                    'carrier_service': service,
-                    'carrier_delivery': True,
-                    'carrier_send_date': ShipmentOut.get_carrier_date(),
-                    'carrier_send_employee': (
-                        ShipmentOut.get_carrier_employee() or None),
-                    })
+                with without_check_access():
+                    cls.write([shipment], {
+                        'carrier_tracking_ref': (
+                            shipment.carrier_tracking_ref+', '+reference
+                            if shipment.carrier_tracking_ref else reference),
+                        'carrier_service': service,
+                        'carrier_delivery': True,
+                        'carrier_send_date': ShipmentOut.get_carrier_date(),
+                        'carrier_send_employee': (
+                            ShipmentOut.get_carrier_employee() or None),
+                        })
                 logger.info('Send shipment %s' % (shipment.number))
                 references.append(shipment.number)
             else:
@@ -431,7 +432,8 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
 
             labels += cls.print_labels_nacex(api, [shipment])
         if labels:
-            cls.write(shipments, {'carrier_printed': True})
+            with without_check_access():
+                cls.write(shipments, {'carrier_printed': True})
         return references, labels, errors
 
     @classmethod
@@ -498,7 +500,8 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                 values['carrier_tracking_ref'] = reference
             to_write.extend(([shipment], values))
         if to_write:
-            cls.write(*to_write)
+            with without_check_access():
+                cls.write(*to_write)
         return labels
 
     @classmethod
@@ -617,17 +620,19 @@ class ShipmentOutReturn(NacexMixin, metaclass=PoolMeta):
                     continue
                 labels.append(temp_name)
 
-                cls.write([shipment], {
-                    'carrier_tracking_ref': reference,
-                    # 'carrier_service': service,
-                    # 'carrier_delivery': True,
-                    'carrier_send_date': ShipmentOutReturn.get_carrier_date(),
-                    'carrier_send_employee': (
-                        ShipmentOutReturn.get_carrier_employee() or None),
-                    'carrier_printed': True,
-                    'carrier_tracking_label': fields.Binary.cast(
-                        open(temp_name, "rb").read()),
-                    })
+                with without_check_access():
+                    cls.write([shipment], {
+                        'carrier_tracking_ref': reference,
+                        # 'carrier_service': service,
+                        # 'carrier_delivery': True,
+                        'carrier_send_date': (
+                            ShipmentOutReturn.get_carrier_date()),
+                        'carrier_send_employee': (
+                            ShipmentOutReturn.get_carrier_employee() or None),
+                        'carrier_printed': True,
+                        'carrier_tracking_label': fields.Binary.cast(
+                            open(temp_name, "rb").read()),
+                        })
                 logger.info('Send shipment %s' % (shipment.number))
                 references.append(shipment.number)
             else:

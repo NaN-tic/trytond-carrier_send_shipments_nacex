@@ -12,12 +12,14 @@ logger = logging.getLogger(__name__)
 def nacex_call(api, method, data):
 
     password = api.password
-    if isinstance(password, str):
-        password = password.encode('utf-8')
+    if not api.md5:
+        if isinstance(password, str):
+            password = password.encode('utf-8')
+        password = hashlib.md5(password).hexdigest()
     url = '%s?method=%s&user=%s&pass=%s&data=%s' % (
         api.url,
         method, api.username,
-        hashlib.md5(password).hexdigest(),
+        password,
         nacex_data(data))
 
     try:

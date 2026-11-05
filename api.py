@@ -13,6 +13,8 @@ __all__ = ['CarrierApi']
 
 class CarrierApi(metaclass=PoolMeta):
     __name__ = 'carrier.api'
+    md5 = fields.Boolean('MD5',
+        help='The password is already an MD5 hash.')
     nacex_delegacion = fields.Char('Delegacion',
         states={
             'required': Eval('method') == 'nacex',

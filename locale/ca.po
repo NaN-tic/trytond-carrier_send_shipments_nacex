@@ -2,6 +2,14 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
+msgctxt "field:carrier.api,md5:"
+msgid "MD5"
+msgstr "MD5"
+
+msgctxt "help:carrier.api,md5:"
+msgid "The password is already an MD5 hash."
+msgstr "La contrasenya ja està en format MD5."
+
 msgctxt "field:carrier.api,nacex_abonado:"
 msgid "Abonado"
 msgstr "Abonado"

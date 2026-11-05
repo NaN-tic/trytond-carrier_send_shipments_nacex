@@ -5,6 +5,9 @@ copyright notices and license terms. -->
 <data>
     <xpath expr="/form/notebook/page[@id='api']" position="after">
         <page string="Nacex" id="nacex">
+            <label name="md5"/>
+            <field name="md5"/>
+            <newline/>
             <label name="nacex_delegacion"/>
             <field name="nacex_delegacion"/>
             <label name="nacex_abonado"/>

@@ -95,9 +95,15 @@ class NacexMixin(ModelSQL, ModelView):
     def nacex_label_file(cls, api, dbname, agencia, numero, api_label):
         if api.print_report == 'IMAGEN_B':
             try:
-                content = base64.urlsafe_b64decode(
-                    api_label + '=' * (4 - len(api_label) % 4))
-            except TypeError:
+                # Nacex wraps Base64 lines and uses '*' for padding.
+                api_label = ''.join(api_label.split()).replace('*', '=')
+                content = base64.b64decode(
+                    api_label + '=' * (-len(api_label) % 4),
+                    altchars=b'-_', validate=True)
+            except (AttributeError, TypeError, ValueError):
+                logger.warning('Invalid Nacex label for %s/%s', agencia, numero)
+                return
+            if not content:
                 return
             suffix = '.png'
         else:

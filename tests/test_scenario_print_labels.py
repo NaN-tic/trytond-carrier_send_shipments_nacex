@@ -70,8 +70,10 @@ class TestPrintLabels(unittest.TestCase):
             for index, response in enumerate(responses):
                 with self.subTest(response=index):
                     shipment = Shipment(customer=customer, company=company,
-                        warehouse=warehouse, carrier=carrier,
-                        carrier_tracking_ref='0801/123456')
+                        warehouse=warehouse, carrier=carrier)
+                    # The tracking reference makes the carrier readonly.
+                    shipment.save()
+                    shipment.carrier_tracking_ref = '0801/123456'
                     shipment.save()
                     wizard = Wizard('carrier.print.shipment', [shipment])
                     with patch(module + '.nacex_call', return_value=

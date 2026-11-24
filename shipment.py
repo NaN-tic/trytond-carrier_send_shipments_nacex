@@ -175,7 +175,7 @@ class ShipmentOut(NacexMixin, metaclass=PoolMeta):
                 if not self.nacex_ref_cli:
                     self.nacex_ref_cli = self.number
 
-            if self.delivery_address:
+            if self.delivery_address and apis:
                 if api.nacex_tip_ea == 'S':
                     self.nacex_ealerta = self.nacex_contact_mechanism(
                         self.delivery_address, {'mobile', 'phone'})
